@@ -22,10 +22,14 @@ Future<bool> contactar(
   CanalContacto canal, {
   String? oficio,
 }) async {
-  // Registrar no debe impedir que el cliente contacte, aunque falle la red.
-  repo.registrarContacto(p.id, canal).catchError((Object e) {
+  // Se espera el registro antes de abrir WhatsApp: si la app pasa a segundo
+  // plano primero, algunos teléfonos (p. ej. Xiaomi) cortan la petición.
+  // Máximo 3 s, y si falla igual se deja contactar.
+  try {
+    await repo.registrarContacto(p.id, canal).timeout(const Duration(seconds: 3));
+  } catch (e) {
     debugPrint('No se pudo registrar el contacto: $e');
-  });
+  }
 
   final uri = canal == CanalContacto.whatsapp
       ? enlaceWhatsapp(p.whatsapp, oficio: oficio)
