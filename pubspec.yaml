@@ -101,3 +101,17 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# Ícono de la app: `dart run flutter_launcher_icons` después de cambiar assets/icono/
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: false
+  image_path: "assets/icono/icono.png"
+  min_sdk_android: 21
+  adaptive_icon_background: "#1E6B52"
+  adaptive_icon_foreground: "assets/icono/frente.png"
+  web:
+    generate: true
+    image_path: "assets/icono/icono.png"
+    background_color: "#1E6B52"
+    theme_color: "#1E6B52"
