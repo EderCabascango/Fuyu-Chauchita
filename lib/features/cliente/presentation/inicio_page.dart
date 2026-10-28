@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/auth/cuenta.dart';
+import '../../../core/auth/sesion.dart';
 import '../../../core/constantes.dart';
 import '../../../core/iconos_oficio.dart';
+import '../../../core/privacidad_page.dart';
 import '../../../core/widgets/mensaje_error.dart';
 import '../data/cliente_repositorio.dart';
 import '../data/modelos.dart';
 import '../data/parroquia_guardada.dart';
+import '../../profesional/presentation/entrada_profesional_page.dart';
 import 'profesionales_page.dart';
 import 'widgets/selector_parroquia.dart';
 
@@ -58,6 +62,23 @@ class _InicioPageState extends State<InicioPage> {
     );
   }
 
+  void _soyMaestro() async {
+    await Navigator.push(context, MaterialPageRoute(builder: (_) => const EntradaProfesionalPage()));
+    if (mounted) setState(() {}); // por si cerró sesión
+  }
+
+  Future<void> _menu(String opcion) async {
+    switch (opcion) {
+      case 'privacidad':
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const PrivacidadPage()));
+      case 'salir':
+        await cerrarSesion();
+      case 'borrar':
+        await confirmarYBorrarCuenta(context);
+    }
+    if (mounted) setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     final texto = Theme.of(context).textTheme;
@@ -97,13 +118,31 @@ class _InicioPageState extends State<InicioPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(nombreApp,
-                              style: texto.labelLarge?.copyWith(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.5,
-                              )),
-                          const SizedBox(height: 6),
+                          Row(children: [
+                            Expanded(
+                              child: Text(nombreApp,
+                                  style: texto.labelLarge?.copyWith(
+                                    color: Theme.of(context).colorScheme.primary,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.5,
+                                  )),
+                            ),
+                            TextButton.icon(
+                              onPressed: _soyMaestro,
+                              icon: const Icon(Icons.handyman_outlined, size: 18),
+                              label: const Text('Soy maestro'),
+                            ),
+                            PopupMenuButton<String>(
+                              onSelected: _menu,
+                              itemBuilder: (_) => [
+                                const PopupMenuItem(value: 'privacidad', child: Text('Privacidad y términos')),
+                                if (haySesion) ...const [
+                                  PopupMenuItem(value: 'salir', child: Text('Cerrar sesión')),
+                                  PopupMenuItem(value: 'borrar', child: Text('Borrar mi cuenta')),
+                                ],
+                              ],
+                            ),
+                          ]),
                           Text('¿Qué necesitas arreglar?',
                               style: texto.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
                           const SizedBox(height: 4),
@@ -130,6 +169,10 @@ class _InicioPageState extends State<InicioPage> {
                         onTap: () => _abrirOficio(oficios[i], parroquias),
                       ),
                     ),
+                  ),
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
+                    sliver: SliverToBoxAdapter(child: _InvitacionMaestro(onTap: _soyMaestro)),
                   ),
                 ],
               ),
@@ -176,6 +219,40 @@ class _TarjetaOficio extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _InvitacionMaestro extends StatelessWidget {
+  const _InvitacionMaestro({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final esquema = Theme.of(context).colorScheme;
+    return Material(
+      color: esquema.primary,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Row(children: [
+            Icon(Icons.storefront_rounded, color: esquema.onPrimary, size: 36),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text('¿Eres maestro?',
+                    style: TextStyle(color: esquema.onPrimary, fontWeight: FontWeight.w800, fontSize: 16)),
+                Text('Publica tu perfil gratis y recibe clientes por WhatsApp.',
+                    style: TextStyle(color: esquema.onPrimary)),
+              ]),
+            ),
+            Icon(Icons.chevron_right_rounded, color: esquema.onPrimary),
+          ]),
         ),
       ),
     );

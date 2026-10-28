@@ -45,18 +45,21 @@ class Resena {
     required this.estrellas,
     this.comentario,
     required this.creadoEn,
+    this.clienteId,
   });
 
   final String id;
   final int estrellas;
   final String? comentario;
   final DateTime creadoEn;
+  final String? clienteId;
 
   factory Resena.fromMap(Map<String, dynamic> m) => Resena(
         id: m['id'] as String,
         estrellas: (m['estrellas'] as num).toInt(),
         comentario: m['comentario'] as String?,
         creadoEn: DateTime.parse(m['creado_en'] as String),
+        clienteId: m['cliente_id'] as String?,
       );
 }
 
@@ -72,6 +75,7 @@ class Profesional {
     required this.verificado,
     required this.promedioEstrellas,
     required this.totalResenas,
+    this.estado,
     this.oficios = const [],
     this.parroquias = const [],
     this.fotos = const [],
@@ -90,6 +94,9 @@ class Profesional {
   final bool verificado;
   final double promedioEstrellas;
   final int totalResenas;
+
+  /// pendiente / aprobado / suspendido (solo viene en "mi perfil" y en admin).
+  final String? estado;
   final List<Oficio> oficios;
   final List<Parroquia> parroquias;
   final List<FotoTrabajo> fotos;
@@ -111,6 +118,7 @@ class Profesional {
       verificado: m['verificado'] as bool? ?? false,
       promedioEstrellas: (m['promedio_estrellas'] as num?)?.toDouble() ?? 0,
       totalResenas: (m['total_resenas'] as num?)?.toInt() ?? 0,
+      estado: m['estado'] as String?,
       oficios: lista('oficios', Oficio.fromMap),
       parroquias: lista('parroquias', Parroquia.fromMap),
       fotos: lista('fotos_trabajo', FotoTrabajo.fromMap)..sort((a, b) => a.orden.compareTo(b.orden)),

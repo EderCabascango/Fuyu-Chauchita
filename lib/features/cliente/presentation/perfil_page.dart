@@ -1,19 +1,28 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
+import '../../../core/auth/sesion.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/mensaje_error.dart';
 import '../data/cliente_repositorio.dart';
 import '../data/contacto.dart';
 import '../data/modelos.dart';
+import 'resena_page.dart';
 import 'widgets/avatar_profesional.dart';
 import 'widgets/estrellas.dart';
 import 'widgets/insignias.dart';
+import 'widgets/reportar.dart';
 
 /// Perfil público de un profesional. Muestra de inmediato los datos de la
 /// lista (`resumen`) y completa fotos y reseñas al cargar.
 class PerfilPage extends StatefulWidget {
-  const PerfilPage({super.key, required this.repo, required this.resumen, this.oficio});
+  const PerfilPage({
+    super.key,
+    required this.repo,
+    required this.resumen,
+    this.oficio,
+    this.vistaPrevia = false,
+  });
 
   final ClienteRepositorio repo;
   final Profesional resumen;
@@ -21,12 +30,31 @@ class PerfilPage extends StatefulWidget {
   /// Oficio por el que llegó el cliente (para el mensaje de WhatsApp).
   final String? oficio;
 
+  /// El profesional mirando su propio perfil: sin contactar, reseñar ni reportar.
+  final bool vistaPrevia;
+
   @override
   State<PerfilPage> createState() => _PerfilPageState();
 }
 
 class _PerfilPageState extends State<PerfilPage> {
   late Future<Profesional?> _perfil = widget.repo.perfil(widget.resumen.id);
+
+  void _recargar() => setState(() => _perfil = widget.repo.perfil(widget.resumen.id));
+
+  Future<void> _calificar(Profesional p) async {
+    if (!await exigirSesion(context, motivo: 'Para dejar una reseña necesitas una cuenta')) return;
+    Resena? actual;
+    try {
+      actual = await widget.repo.miResena(p.id);
+    } catch (_) {}
+    if (!mounted) return;
+    final cambio = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(builder: (_) => ResenaPage(repo: widget.repo, profesional: p, actual: actual)),
+    );
+    if (cambio == true) _recargar();
+  }
 
   Future<void> _contactar(Profesional p, CanalContacto canal) async {
     final ok = await contactar(widget.repo, p, canal, oficio: widget.oficio);
@@ -57,16 +85,36 @@ class _PerfilPageState extends State<PerfilPage> {
         } else if (!cargando && completo == null) {
           cuerpo = const MensajeError(mensaje: 'Este perfil ya no está disponible.');
         } else {
-          cuerpo = _ContenidoPerfil(profesional: p, cargandoDetalle: cargando);
+          cuerpo = _ContenidoPerfil(
+            profesional: p,
+            cargandoDetalle: cargando,
+            vistaPrevia: widget.vistaPrevia,
+            onCalificar: () => _calificar(p),
+            onReportarResena: (r) => reportar(context, repo: widget.repo, tipo: TipoReporte.resena, objetivoId: r.id),
+          );
         }
 
         return Scaffold(
-          appBar: AppBar(),
-          body: cuerpo,
-          bottomNavigationBar: _BotonesContacto(
-            onWhatsapp: () => _contactar(p, CanalContacto.whatsapp),
-            onLlamar: () => _contactar(p, CanalContacto.llamada),
+          appBar: AppBar(
+            title: widget.vistaPrevia ? const Text('Así te ven los clientes') : null,
+            actions: [
+              if (!widget.vistaPrevia)
+                PopupMenuButton<String>(
+                  onSelected: (_) =>
+                      reportar(context, repo: widget.repo, tipo: TipoReporte.perfil, objetivoId: p.id),
+                  itemBuilder: (_) => const [
+                    PopupMenuItem(value: 'reportar', child: Text('Reportar perfil')),
+                  ],
+                ),
+            ],
           ),
+          body: cuerpo,
+          bottomNavigationBar: widget.vistaPrevia
+              ? null
+              : _BotonesContacto(
+                  onWhatsapp: () => _contactar(p, CanalContacto.whatsapp),
+                  onLlamar: () => _contactar(p, CanalContacto.llamada),
+                ),
         );
       },
     );
@@ -74,10 +122,19 @@ class _PerfilPageState extends State<PerfilPage> {
 }
 
 class _ContenidoPerfil extends StatelessWidget {
-  const _ContenidoPerfil({required this.profesional, required this.cargandoDetalle});
+  const _ContenidoPerfil({
+    required this.profesional,
+    required this.cargandoDetalle,
+    required this.vistaPrevia,
+    required this.onCalificar,
+    required this.onReportarResena,
+  });
 
   final Profesional profesional;
   final bool cargandoDetalle;
+  final bool vistaPrevia;
+  final VoidCallback onCalificar;
+  final ValueChanged<Resena> onReportarResena;
 
   @override
   Widget build(BuildContext context) {
@@ -171,10 +228,25 @@ class _ContenidoPerfil extends StatelessWidget {
 
           // Reseñas
           _Titulo('Reseñas${p.totalResenas > 0 ? ' (${p.totalResenas})' : ''}'),
+          if (!vistaPrevia) ...[
+            OutlinedButton.icon(
+              onPressed: onCalificar,
+              icon: const Icon(Icons.star_outline_rounded),
+              label: Text(p.resenas.any((r) => r.clienteId != null && r.clienteId == usuarioActual?.id)
+                  ? 'Editar tu reseña'
+                  : '¿Te atendió? Califícalo'),
+            ),
+            const SizedBox(height: 12),
+          ],
           if (p.resenas.isEmpty)
             Text('Todavía nadie ha dejado una reseña.', style: TextStyle(color: gris))
           else
-            for (final r in p.resenas) _TarjetaResena(resena: r),
+            for (final r in p.resenas)
+              _TarjetaResena(
+                resena: r,
+                esMia: r.clienteId != null && r.clienteId == usuarioActual?.id,
+                onReportar: vistaPrevia ? null : () => onReportarResena(r),
+              ),
         ],
       ],
     );
@@ -238,8 +310,10 @@ class _Aviso extends StatelessWidget {
 }
 
 class _TarjetaResena extends StatelessWidget {
-  const _TarjetaResena({required this.resena});
+  const _TarjetaResena({required this.resena, this.esMia = false, this.onReportar});
   final Resena resena;
+  final bool esMia;
+  final VoidCallback? onReportar;
 
   static const _meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
 
@@ -257,9 +331,28 @@ class _TarjetaResena extends StatelessWidget {
               Row(
                 children: [
                   FilaEstrellas(estrellas: resena.estrellas),
+                  if (esMia) ...[
+                    const SizedBox(width: 8),
+                    Text('Tu reseña',
+                        style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: Theme.of(context).colorScheme.primary)),
+                  ],
                   const Spacer(),
                   Text('${f.day} ${_meses[f.month - 1]} ${f.year}',
                       style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.outline)),
+                  if (onReportar != null && !esMia)
+                    SizedBox(
+                      width: 32,
+                      height: 24,
+                      child: PopupMenuButton<String>(
+                        padding: EdgeInsets.zero,
+                        iconSize: 18,
+                        onSelected: (_) => onReportar!(),
+                        itemBuilder: (_) => const [PopupMenuItem(value: 'r', child: Text('Reportar reseña'))],
+                      ),
+                    ),
                 ],
               ),
               if ((resena.comentario ?? '').isNotEmpty) ...[

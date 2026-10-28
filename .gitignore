@@ -52,3 +52,9 @@ app.*.map.json
 # Supabase CLI local
 supabase/.branches
 supabase/.temp
+
+# Firma de Play Store y configuración de Firebase (privadas)
+android/key.properties
+*.jks
+*.keystore
+android/app/google-services.json

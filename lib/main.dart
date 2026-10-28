@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'core/config/env.dart';
+import 'core/notificaciones.dart';
 import 'core/supabase.dart';
 import 'core/theme/app_theme.dart';
 import 'core/widgets/mensaje_error.dart';
@@ -12,6 +13,7 @@ Future<void> main() async {
   final errorConfig = await Env.cargar();
   if (errorConfig == null) {
     await iniciarSupabase();
+    await Notificaciones.iniciar();
   }
 
   runApp(OficiosApp(errorConfig: errorConfig));
@@ -28,6 +30,7 @@ class OficiosApp extends StatelessWidget {
     return MaterialApp(
       title: 'Oficios Cayambe',
       debugShowCheckedModeBanner: false,
+      scaffoldMessengerKey: Notificaciones.mensajero,
       theme: AppTheme.claro,
       home: errorConfig == null
           ? const InicioPage()

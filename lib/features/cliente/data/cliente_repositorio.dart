@@ -57,12 +57,49 @@ class ClienteRepositorio {
         .from('profesionales')
         .select('$_camposResumen, '
             'fotos_trabajo(id, url, orden), '
-            'resenas(id, estrellas, comentario, creado_en)')
+            'resenas(id, estrellas, comentario, creado_en, cliente_id)')
         .eq('id', id)
         .eq('estado', 'aprobado')
         .maybeSingle();
     return fila == null ? null : Profesional.fromMap(fila);
   }
+
+  /// Mi reseña para este profesional, si ya dejé una.
+  Future<Resena?> miResena(String profesionalId) async {
+    final uid = _db.auth.currentUser?.id;
+    if (uid == null) return null;
+    final fila = await _db
+        .from('resenas')
+        .select('id, estrellas, comentario, creado_en, cliente_id')
+        .eq('profesional_id', profesionalId)
+        .eq('cliente_id', uid)
+        .maybeSingle();
+    return fila == null ? null : Resena.fromMap(fila);
+  }
+
+  /// Crea o actualiza mi reseña (una por profesional).
+  Future<void> guardarResena(String profesionalId, int estrellas, String? comentario) {
+    final texto = comentario?.trim();
+    return _db.from('resenas').upsert(
+      {
+        'profesional_id': profesionalId,
+        'cliente_id': _db.auth.currentUser!.id,
+        'estrellas': estrellas,
+        'comentario': (texto == null || texto.isEmpty) ? null : texto,
+      },
+      onConflict: 'profesional_id,cliente_id',
+    );
+  }
+
+  Future<void> borrarResena(String resenaId) => _db.from('resenas').delete().eq('id', resenaId);
+
+  Future<void> reportar({required TipoReporte tipo, required String objetivoId, required String motivo}) =>
+      _db.from('reportes').insert({
+        'tipo': tipo == TipoReporte.perfil ? 'perfil' : 'resena',
+        'objetivo_id': objetivoId,
+        'motivo': motivo,
+        'reportado_por': _db.auth.currentUser!.id,
+      });
 
   /// Registra un toque al botón de WhatsApp o llamada (métrica principal).
   Future<void> registrarContacto(String profesionalId, CanalContacto canal) =>
@@ -70,3 +107,5 @@ class ClienteRepositorio {
 }
 
 enum CanalContacto { whatsapp, llamada }
+
+enum TipoReporte { perfil, resena }
