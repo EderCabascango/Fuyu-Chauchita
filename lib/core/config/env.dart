@@ -9,6 +9,13 @@ class Env {
   static String get supabaseUrl => _leer('SUPABASE_URL');
   static String get supabaseAnonKey => _leer('SUPABASE_ANON_KEY');
 
+  /// ID de cliente "Web" de Google Cloud, para el ingreso con Google.
+  /// Opcional: sin él la app funciona, pero no se puede ingresar.
+  static String? get googleWebClientId {
+    final valor = dotenv.maybeGet('GOOGLE_WEB_CLIENT_ID')?.trim() ?? '';
+    return valor.endsWith('.apps.googleusercontent.com') ? valor : null;
+  }
+
   /// Carga el `.env` y devuelve un mensaje de error si falta algo,
   /// o `null` si todo está bien.
   static Future<String?> cargar() async {

@@ -7,7 +7,7 @@ hasta que sale al público, por la prueba cerrada obligatoria de 14 días.
 
 - [ ] Ejecutar `supabase/migrations/20261028000000_profesional_confianza.sql` en el SQL Editor
       (después de la migración inicial).
-- [ ] Configurar el SMS: [SMS.md](SMS.md).
+- [ ] Configurar el ingreso con Google: [GOOGLE.md](GOOGLE.md) (incluye agregar la huella SHA-1 de Play).
 - [ ] Crear tu cuenta admin: [PANEL_ADMIN.md](PANEL_ADMIN.md).
 - [ ] (Opcional al inicio) Notificaciones: [NOTIFICACIONES.md](NOTIFICACIONES.md).
 - [ ] **Borrar los datos demo**: ejecutar `supabase/demo/borrar_demo.sql`.
@@ -63,8 +63,8 @@ del `+` debe crecer siempre).
 3. **Ficha de la tienda** (textos abajo), ícono 512×512 (`assets/icono/icono.png` reducido),
    gráfico de funciones 1024×500 y 2 a 8 capturas del teléfono.
 4. **Contenido de la app**: política de privacidad (URL del paso 1), anuncios: **No**,
-   acceso a la app: explica que se puede usar sin cuenta y que el login es por SMS
-   (da un número de prueba de [SMS.md](SMS.md) para los revisores), clasificación de contenido,
+   acceso a la app: explica que se puede usar sin cuenta y que para publicar un perfil
+   o reseñar se entra con cualquier cuenta de Google (no hacen falta credenciales especiales), clasificación de contenido,
    público objetivo: 18+, **Seguridad de los datos** (abajo).
 5. **Prueba cerrada**: sube el `.aab`, crea una lista de testers con sus correos de Gmail y
    comparte el enlace de inscripción.
@@ -79,8 +79,9 @@ del `+` debe crecer siempre).
 | ¿Recopila o comparte datos? | Sí recopila. No comparte con terceros (los proveedores procesan por cuenta propia). |
 | ¿Cifrado en tránsito? | Sí |
 | ¿El usuario puede pedir que se borren? | Sí, desde la app (Borrar mi cuenta) |
-| Número de teléfono | Recopilado · Obligatorio para cuenta · Funcionalidad de la app, administración de la cuenta |
-| Nombre | Recopilado (solo maestros) · Funcionalidad de la app |
+| Dirección de correo electrónico | Recopilada · Obligatoria para cuenta · Funcionalidad de la app, administración de la cuenta |
+| Número de teléfono (WhatsApp del maestro) | Recopilado (solo maestros) · Funcionalidad de la app |
+| Nombre | Recopilado · Funcionalidad de la app, administración de la cuenta |
 | Fotos | Recopiladas (solo maestros) · Funcionalidad de la app |
 | Otro contenido generado por el usuario (reseñas, reportes) | Recopilado · Funcionalidad de la app |
 | Interacciones en la app (toques a WhatsApp/llamada) | Recopilado · Analítica · No vinculado a la persona |

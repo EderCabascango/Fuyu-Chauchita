@@ -1,23 +1,33 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/supabase.dart';
+import '../../../core/telefono.dart';
 import '../../cliente/data/modelos.dart';
 
 /// Perfil visto por el administrador (con datos internos).
 class ProfesionalAdmin {
-  ProfesionalAdmin(this.p, {this.telefonoCuenta, required this.plan, required this.creadoEn});
+  ProfesionalAdmin(this.p, {this.cuenta, required this.plan, required this.creadoEn});
 
   final Profesional p;
-  final String? telefonoCuenta;
+
+  /// Con qué entró el maestro: su correo de Google (o su celular, en cuentas antiguas).
+  final String? cuenta;
   final String plan;
   final DateTime creadoEn;
 
   factory ProfesionalAdmin.fromMap(Map<String, dynamic> m) => ProfesionalAdmin(
         Profesional.fromMap(m),
-        telefonoCuenta: (m['usuarios'] as Map<String, dynamic>?)?['telefono'] as String?,
+        cuenta: _cuenta(m['usuarios'] as Map<String, dynamic>?),
         plan: m['plan'] as String? ?? 'gratis',
         creadoEn: DateTime.parse(m['creado_en'] as String),
       );
+
+  static String? _cuenta(Map<String, dynamic>? u) {
+    final correo = u?['correo'] as String?;
+    if (correo != null && correo.isNotEmpty) return correo;
+    final tel = u?['telefono'] as String?;
+    return tel == null ? null : mostrarCelular(tel);
+  }
 }
 
 class Reporte {
@@ -64,7 +74,7 @@ class AdminRepositorio {
     var q = _db.from('profesionales').select(
         'id, nombre_publico, foto_url, descripcion, whatsapp, horario, disponible_ahora, '
         'verificado, promedio_estrellas, total_resenas, estado, plan, creado_en, '
-        'usuarios(telefono), oficios(id, nombre, icono), parroquias(id, nombre), '
+        'usuarios(telefono, correo), oficios(id, nombre, icono), parroquias(id, nombre), '
         'fotos_trabajo(id, url, orden)');
     if (estado != null) q = q.eq('estado', estado);
     final filas = await q.order('creado_en', ascending: estado == 'pendiente');

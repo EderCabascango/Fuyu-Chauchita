@@ -8,6 +8,7 @@ import 'sesion.dart';
 Future<void> cerrarSesion() async {
   await Notificaciones.olvidarDispositivo();
   await supabase.auth.signOut();
+  await salirDeGoogle();
 }
 
 /// Pide confirmación y borra la cuenta con todos sus datos.
@@ -39,6 +40,7 @@ Future<bool> confirmarYBorrarCuenta(BuildContext context) async {
     await borrarTodasMisFotos();
     await supabase.rpc('eliminar_mi_cuenta');
     await supabase.auth.signOut();
+    await salirDeGoogle();
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Tu cuenta fue borrada.')));
     }

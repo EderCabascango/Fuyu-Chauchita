@@ -27,7 +27,7 @@ class PrivacidadPage extends StatelessWidget {
           ),
           titulo('Qué datos guardamos'),
           const Text(
-            '• Tu número de celular, para ingresar con un código SMS.\n'
+            '• Tu nombre y correo de Google, para identificar tu cuenta (no se muestran a nadie).\n'
             '• Si eres maestro: el perfil que publicas (nombre, foto, oficios, zonas, horario, '
             'WhatsApp y fotos de trabajos).\n'
             '• Las reseñas que escribes.\n'
@@ -38,7 +38,7 @@ class PrivacidadPage extends StatelessWidget {
           titulo('Qué es público'),
           const Text(
             'El perfil de los maestros aprobados, incluido su número de WhatsApp, y las reseñas '
-            '(sin el nombre ni el número de quien las escribe).',
+            '(sin el nombre ni el correo de quien las escribe).',
           ),
           titulo('Reglas'),
           const Text(

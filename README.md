@@ -13,7 +13,7 @@ y permite contactarlos directo por WhatsApp. La especificación completa está e
 | Base de datos, seguridad (RLS) | `supabase/migrations/` |
 | Notificaciones push | `supabase/functions/notificar/` → [docs/NOTIFICACIONES.md](docs/NOTIFICACIONES.md) |
 | Publicar en Play Store | [docs/PUBLICACION.md](docs/PUBLICACION.md) |
-| Ingreso por SMS | [docs/SMS.md](docs/SMS.md) |
+| Ingreso con Google | [docs/GOOGLE.md](docs/GOOGLE.md) |
 
 ## Estructura
 
@@ -21,7 +21,7 @@ y permite contactarlos directo por WhatsApp. La especificación completa está e
 lib/
   main.dart                 app Android
   main_admin.dart           panel web del administrador
-  core/                     config (.env), Supabase, login SMS, fotos, notificaciones, tema
+  core/                     config (.env), Supabase, login con Google, fotos, notificaciones, tema
   features/
     cliente/                inicio, lista por parroquia, perfil, WhatsApp/llamada,
                             reseñas y reportes
@@ -44,10 +44,11 @@ Cada feature separa `data/` (consultas a Supabase) de `presentation/` (pantallas
 2. En el SQL Editor de Supabase ejecuta, en orden:
    1. `supabase/migrations/20261027000000_esquema_inicial.sql`
    2. `supabase/migrations/20261028000000_profesional_confianza.sql`
-   3. `supabase/seed.sql`
+   3. `supabase/migrations/20261029000000_ingreso_google.sql`
+   4. `supabase/seed.sql`
 3. (Opcional, para probar) `supabase/demo/datos_demo.sql`: 12 profesionales ficticios.
    Bórralos antes del lanzamiento con `supabase/demo/borrar_demo.sql`.
-4. Configura el SMS ([docs/SMS.md](docs/SMS.md)) para que funcione "Soy maestro" y las reseñas.
+4. Configura el ingreso con Google ([docs/GOOGLE.md](docs/GOOGLE.md)) para que funcione "Soy maestro" y las reseñas.
 5. `flutter run` con el celular conectado por USB.
 
 Si cambias el `.env` y la app sigue con los valores viejos: `flutter clean` y

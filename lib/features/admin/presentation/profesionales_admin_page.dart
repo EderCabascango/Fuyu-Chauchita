@@ -142,7 +142,7 @@ class _TarjetaAdmin extends StatelessWidget {
         children: [
           Wrap(spacing: 24, runSpacing: 8, children: [
             _Dato('WhatsApp', mostrarCelular(p.whatsapp)),
-            _Dato('Celular de la cuenta', item.telefonoCuenta == null ? '—' : mostrarCelular(item.telefonoCuenta!)),
+            _Dato('Cuenta', item.cuenta ?? '—'),
             _Dato('Registrado', '${f.day}/${f.month}/${f.year}'),
             _Dato('Horario', p.horario ?? '—'),
           ]),
