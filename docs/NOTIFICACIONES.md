@@ -1,6 +1,6 @@
 # Notificaciones push (Firebase)
 
-La app avisa al maestro cuando **aprueban su perfil** y cuando **recibe una reseña**.
+La app avisa al profesional cuando **aprueban su perfil** y cuando **recibe una reseña**.
 Sin estos pasos la app funciona igual, solo que no llegan notificaciones.
 
 ## 1. Crear el proyecto de Firebase (gratis)
@@ -13,7 +13,7 @@ Sin estos pasos la app funciona igual, solo que no llegan notificaciones.
 3. Descarga **google-services.json** y ponlo en `android/app/google-services.json`.
    (Está en `.gitignore`, no se sube a git.)
 4. Vuelve a compilar: `flutter clean` y `flutter run`. La app ya registra el teléfono del
-   maestro al abrir "Mi perfil" (pide permiso de notificaciones).
+   profesional al abrir "Mi perfil" (pide permiso de notificaciones).
 
 ## 2. Clave para que Supabase envíe notificaciones
 
@@ -64,7 +64,7 @@ En los dos:
 
 ## Probar
 
-1. En el celular, entra como maestro a "Mi perfil" y acepta el permiso de notificaciones.
+1. En el celular, entra como profesional a "Mi perfil" y acepta el permiso de notificaciones.
 2. Desde el panel admin, aprueba ese perfil.
 3. Debe llegar "¡Tu perfil fue aprobado!". Si no llega, mira
    **Edge Functions → notificar → Logs** en Supabase.

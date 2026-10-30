@@ -48,10 +48,11 @@ esta llave de subida no puedes publicar actualizaciones sin un trámite de recup
 
 ```bash
 flutter clean
-flutter build appbundle --release
+flutter build appbundle --release --obfuscate --split-debug-info=build/simbolos
 ```
 
-Resultado: `build/app/outputs/bundle/release/app-release.aab`.
+Resultado: `build/app/outputs/bundle/release/app-release.aab`. `--obfuscate` hace más difícil leer el
+código de la app si alguien la descompila (guarda la carpeta `build/simbolos` para entender errores).
 Para cada actualización sube el número en `pubspec.yaml` (`version: 1.0.1+2`: el número después
 del `+` debe crecer siempre).
 
@@ -69,7 +70,7 @@ del `+` debe crecer siempre).
 5. **Prueba cerrada**: sube el `.aab`, crea una lista de testers con sus correos de Gmail y
    comparte el enlace de inscripción.
    - Mínimo **12 testers** inscritos **14 días seguidos**. Apunta a 15–20 por si alguien se sale.
-   - Usa a los primeros maestros registrados y a familiares.
+   - Usa a los primeros profesionales registrados y a familiares.
 6. A los 14 días: **Solicitar acceso a producción**.
 
 ## Seguridad de los datos (respuestas para el formulario)
@@ -80,12 +81,12 @@ del `+` debe crecer siempre).
 | ¿Cifrado en tránsito? | Sí |
 | ¿El usuario puede pedir que se borren? | Sí, desde la app (Borrar mi cuenta) |
 | Dirección de correo electrónico | Recopilada · Obligatoria para cuenta · Funcionalidad de la app, administración de la cuenta |
-| Número de teléfono (WhatsApp del maestro) | Recopilado (solo maestros) · Funcionalidad de la app |
+| Número de teléfono (WhatsApp del profesional) | Recopilado (solo profesionales) · Funcionalidad de la app |
 | Nombre | Recopilado · Funcionalidad de la app, administración de la cuenta |
-| Fotos | Recopiladas (solo maestros) · Funcionalidad de la app |
+| Fotos | Recopiladas (solo profesionales) · Funcionalidad de la app |
 | Otro contenido generado por el usuario (reseñas, reportes) | Recopilado · Funcionalidad de la app |
 | Interacciones en la app (toques a WhatsApp/llamada) | Recopilado · Analítica · No vinculado a la persona |
-| ID del dispositivo (token de notificaciones) | Recopilado (solo maestros) · Funcionalidad de la app |
+| ID del dispositivo (token de notificaciones) | Recopilado (solo profesionales) · Funcionalidad de la app |
 | Ubicación, contactos, pagos | No |
 
 ## Textos de la ficha
@@ -93,11 +94,11 @@ del `+` debe crecer siempre).
 **Nombre (máx. 30):** Oficios Cayambe
 
 **Descripción corta (máx. 80):**
-Encuentra electricistas, plomeros y más maestros en Cayambe. Contacto directo.
+Encuentra electricistas, plomeros y más profesionales en Cayambe. Contacto directo.
 
 **Descripción completa:**
 
-> ¿Se dañó algo en casa? Encuentra maestros de confianza en Cayambe y sus parroquias, y
+> ¿Se dañó algo en casa? Encuentra profesionales de confianza en Cayambe y sus parroquias, y
 > escríbeles directo por WhatsApp. Sin intermediarios y sin comisiones.
 >
 > • Electricistas, plomeros, carpinteros, albañiles, mecánicos, gas a domicilio, pintores,
@@ -109,7 +110,7 @@ Encuentra electricistas, plomeros y más maestros en Cayambe. Contacto directo.
 > • Sello "Verificado": revisamos su cédula y referencias.
 > • Contacta por WhatsApp o llamada con un toque. No necesitas crear cuenta.
 >
-> ¿Eres maestro? Publica tu perfil gratis, sube fotos de tus trabajos y recibe clientes por
+> ¿Eres profesional? Publica tu perfil gratis, sube fotos de tus trabajos y recibe clientes por
 > WhatsApp. Tú cierras el trato a tu manera.
 
 **Categoría:** Casa y hogar (o Estilo de vida). **Etiquetas:** servicios, hogar, reparaciones.
@@ -126,4 +127,4 @@ adb shell screencap -p /sdcard/captura.png
 adb pull /sdcard/captura.png captura-inicio.png
 ```
 
-Sugeridas: inicio con la grilla, lista de un oficio, perfil con fotos, "Mi perfil" del maestro.
+Sugeridas: inicio con la grilla, lista de un oficio, perfil con fotos, "Mi perfil" del profesional.

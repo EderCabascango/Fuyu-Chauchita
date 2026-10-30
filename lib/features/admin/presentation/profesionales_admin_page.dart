@@ -68,7 +68,6 @@ class _ProfesionalesAdminPageState extends State<ProfesionalesAdminPage> {
                   isDense: true,
                   prefixIcon: Icon(Icons.search),
                   hintText: 'Buscar por nombre',
-                  border: OutlineInputBorder(),
                 ),
                 onChanged: (v) => setState(() => _busqueda = v.toLowerCase()),
               ),

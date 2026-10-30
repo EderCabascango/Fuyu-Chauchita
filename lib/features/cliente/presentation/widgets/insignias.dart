@@ -2,22 +2,30 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_theme.dart';
 
-/// Etiqueta "Disponible ahora".
+/// Etiqueta "Disponible ahora". `sobreOscuro` para usarla sobre fondo azul.
 class InsigniaDisponible extends StatelessWidget {
-  const InsigniaDisponible({super.key});
+  const InsigniaDisponible({super.key, this.sobreOscuro = false});
+
+  final bool sobreOscuro;
 
   @override
   Widget build(BuildContext context) {
+    final colorTexto = sobreOscuro ? Colors.white : const Color(0xFF0B7A3B);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: AppTheme.verdeWhatsapp.withValues(alpha: 0.15),
+        color: sobreOscuro ? const Color(0x3325D366) : AppTheme.verdeWhatsapp.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(20),
       ),
-      child: const Text(
-        'Disponible ahora',
-        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF0B7A3B)),
-      ),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        Container(
+          width: 7,
+          height: 7,
+          decoration: const BoxDecoration(color: AppTheme.verdeWhatsapp, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 6),
+        Text('Disponible ahora', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: colorTexto)),
+      ]),
     );
   }
 }

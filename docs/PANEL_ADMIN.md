@@ -38,7 +38,7 @@ lo vuelve a comprobar en cada acción (RLS).
 
 | Sección | Para qué |
 |---|---|
-| Por aprobar | Perfiles nuevos. Aprobar, suspender, verificar, escribir al maestro. |
+| Por aprobar | Perfiles nuevos. Aprobar, suspender, verificar, escribir al profesional. |
 | Profesionales | Todos, con filtro por estado y búsqueda. Plan "destacado" (campo listo, sin cobro). |
 | Reportes | Suspender perfil, borrar reseña, bloquear al autor, o descartar. |
 | Métricas | Contactos, profesionales activos, reseñas por contacto, cobertura oficio × parroquia. |

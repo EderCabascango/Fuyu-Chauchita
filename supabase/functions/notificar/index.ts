@@ -31,9 +31,10 @@ const jwt = new JWT({
 });
 
 Deno.serve(async (req) => {
-  if (req.headers.get("x-webhook-secret") !== Deno.env.get("WEBHOOK_SECRET")) {
+  if (!secretoValido(req.headers.get("x-webhook-secret"))) {
     return new Response("No autorizado", { status: 401 });
   }
+  if (req.method !== "POST") return new Response("Método no permitido", { status: 405 });
 
   const p = (await req.json()) as Payload;
   const aviso = await armarAviso(p);
@@ -109,4 +110,15 @@ async function enviar(token: string, titulo: string, cuerpo: string): Promise<bo
     console.error("FCM", res.status, error);
   }
   return false;
+}
+
+/// Compara el secreto en tiempo constante (no revela cuántas letras acertó).
+function secretoValido(recibido: string | null): boolean {
+  const esperado = Deno.env.get("WEBHOOK_SECRET") ?? "";
+  if (esperado.length < 16 || recibido === null) return false;
+  const a = new TextEncoder().encode(recibido);
+  const b = new TextEncoder().encode(esperado);
+  let diferencia = a.length ^ b.length;
+  for (let i = 0; i < b.length; i++) diferencia |= (a[i] ?? 0) ^ b[i];
+  return diferencia === 0;
 }

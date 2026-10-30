@@ -1,6 +1,6 @@
 # Oficios Cayambe
 
-App Android (Flutter + Supabase) que reúne a los maestros de oficios de Cayambe
+App Android (Flutter + Supabase) que reúne a los profesionales de oficios de Cayambe
 y permite contactarlos directo por WhatsApp. La especificación completa está en
 `App de Oficios Cayambe — Especificación MVP.docx`.
 
@@ -8,12 +8,14 @@ y permite contactarlos directo por WhatsApp. La especificación completa está e
 
 | Parte | Dónde |
 |---|---|
-| App Android (clientes y maestros) | `lib/main.dart` |
+| App Android (clientes y profesionales) | `lib/main.dart` |
 | Panel web del administrador | `lib/main_admin.dart` → [docs/PANEL_ADMIN.md](docs/PANEL_ADMIN.md) |
 | Base de datos, seguridad (RLS) | `supabase/migrations/` |
 | Notificaciones push | `supabase/functions/notificar/` → [docs/NOTIFICACIONES.md](docs/NOTIFICACIONES.md) |
 | Publicar en Play Store | [docs/PUBLICACION.md](docs/PUBLICACION.md) |
 | Ingreso con Google | [docs/GOOGLE.md](docs/GOOGLE.md) |
+| Ingreso por correo | [docs/CORREO.md](docs/CORREO.md) |
+| Seguridad (revisión y pruebas) | [docs/SEGURIDAD.md](docs/SEGURIDAD.md) |
 
 ## Estructura
 
@@ -21,7 +23,7 @@ y permite contactarlos directo por WhatsApp. La especificación completa está e
 lib/
   main.dart                 app Android
   main_admin.dart           panel web del administrador
-  core/                     config (.env), Supabase, login con Google, fotos, notificaciones, tema
+  core/                     config (.env), Supabase, login (Google y correo), fotos, notificaciones, tema
   features/
     cliente/                inicio, lista por parroquia, perfil, WhatsApp/llamada,
                             reseñas y reportes
@@ -45,10 +47,11 @@ Cada feature separa `data/` (consultas a Supabase) de `presentation/` (pantallas
    1. `supabase/migrations/20261027000000_esquema_inicial.sql`
    2. `supabase/migrations/20261028000000_profesional_confianza.sql`
    3. `supabase/migrations/20261029000000_ingreso_google.sql`
-   4. `supabase/seed.sql`
+   4. `supabase/migrations/20261030000000_seguridad_y_oficios.sql`
+   5. `supabase/seed.sql`
 3. (Opcional, para probar) `supabase/demo/datos_demo.sql`: 12 profesionales ficticios.
    Bórralos antes del lanzamiento con `supabase/demo/borrar_demo.sql`.
-4. Configura el ingreso con Google ([docs/GOOGLE.md](docs/GOOGLE.md)) para que funcione "Soy maestro" y las reseñas.
+4. Configura el ingreso con Google ([docs/GOOGLE.md](docs/GOOGLE.md)) y por correo ([docs/CORREO.md](docs/CORREO.md)) para que funcione "Soy profesional" y las reseñas.
 5. `flutter run` con el celular conectado por USB.
 
 Si cambias el `.env` y la app sigue con los valores viejos: `flutter clean` y
@@ -59,7 +62,9 @@ Si cambias el `.env` y la app sigue con los valores viejos: `flutter clean` y
 ```bash
 flutter run                                   # app en el celular
 flutter run -d chrome -t lib/main_admin.dart  # panel admin en el navegador
-flutter test                                  # tests
+flutter test                                  # pruebas de la app
+cd supabase/tests && npm install && npm test  # pruebas de seguridad de la base (32 ataques)
+node supabase/tests/en_vivo.mjs               # ataques sin cuenta contra tu Supabase real
 dart run flutter_launcher_icons               # regenerar íconos desde assets/icono/
-flutter build appbundle --release             # paquete para Play Store
+flutter build appbundle --release --obfuscate --split-debug-info=build/simbolos  # paquete para Play Store
 ```

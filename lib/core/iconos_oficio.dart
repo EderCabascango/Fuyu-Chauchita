@@ -14,6 +14,10 @@ const _iconos = <String, IconData>{
   'hardware': Icons.hardware,
   'kitchen': Icons.kitchen,
   'handyman': Icons.handyman,
+  'videocam': Icons.videocam,
+  'cell_tower': Icons.cell_tower,
+  'computer': Icons.computer,
+  'local_taxi': Icons.local_taxi,
 };
 
 IconData iconoOficio(String? nombre) => _iconos[nombre] ?? Icons.handyman;

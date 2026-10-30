@@ -37,6 +37,19 @@ Future<bool> ingresarConGoogle() async {
   return true;
 }
 
+/// Correo con forma válida (nombre@dominio.ext).
+bool correoValido(String correo) => RegExp(r'^[^\s@]+@[^\s@]+\.[A-Za-z]{2,}$').hasMatch(correo.trim());
+
+/// Normaliza el correo para que "Ana@Gmail.com " y "ana@gmail.com" sean la misma cuenta.
+String normalizarCorreo(String correo) => correo.trim().toLowerCase();
+
+/// Envía un código de un solo uso al correo. Crea la cuenta si no existe.
+Future<void> enviarCodigoCorreo(String correo) =>
+    supabase.auth.signInWithOtp(email: normalizarCorreo(correo), shouldCreateUser: true);
+
+Future<void> verificarCodigoCorreo(String correo, String codigo) =>
+    supabase.auth.verifyOTP(email: normalizarCorreo(correo), token: codigo.trim(), type: OtpType.email);
+
 /// Olvida la cuenta de Google elegida, para poder escoger otra la próxima vez.
 Future<void> salirDeGoogle() async {
   try {
@@ -80,8 +93,21 @@ String mensajeDeError(Object e) {
     if (texto.contains('audience')) {
       return 'El ID de cliente de Google no coincide con el configurado en Supabase.';
     }
+    if (texto.contains('email') && texto.contains('rate')) {
+      return 'Se enviaron demasiados correos. Espera unos minutos y vuelve a intentar.';
+    }
     if (texto.contains('rate') || texto.contains('too many') || e.statusCode == '429') {
       return 'Demasiados intentos. Espera un minuto y vuelve a intentar.';
+    }
+    if (texto.contains('expired') || texto.contains('token') || texto.contains('otp')) {
+      return 'El código no es correcto o ya venció. Pide uno nuevo.';
+    }
+    if (texto.contains('signups not allowed') || texto.contains('email logins are disabled') ||
+        texto.contains('email provider')) {
+      return 'El ingreso por correo todavía no está configurado.';
+    }
+    if (texto.contains('smtp') || texto.contains('sending') || texto.contains('magic link')) {
+      return 'No pudimos enviar el correo. Intenta de nuevo en unos minutos.';
     }
     return e.message;
   }

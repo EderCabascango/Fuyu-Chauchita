@@ -10,6 +10,10 @@ import '../../cliente/data/cliente_repositorio.dart';
 import '../../cliente/data/modelos.dart';
 import '../data/profesional_repositorio.dart';
 
+/// ¿Las parroquias elegidas cubren todo el cantón?
+bool todoElCanton(Set<int> elegidas, List<Parroquia> todas) =>
+    todas.isNotEmpty && todas.every((p) => elegidas.contains(p.id));
+
 /// Crear (si `actual` es null) o editar el perfil del profesional.
 class EditarPerfilPage extends StatefulWidget {
   const EditarPerfilPage({super.key, required this.repo, this.actual, this.onGuardado});
@@ -163,7 +167,6 @@ class _EditarPerfilPageState extends State<EditarPerfilPage> {
                   decoration: const InputDecoration(
                     labelText: 'Nombre que verán los clientes *',
                     hintText: 'Ej.: Luis Cuzco o Gas Express Cayambe',
-                    border: OutlineInputBorder(),
                   ),
                   validator: (v) => (v ?? '').trim().length < 3 ? 'Escribe tu nombre.' : null,
                 ),
@@ -176,7 +179,6 @@ class _EditarPerfilPageState extends State<EditarPerfilPage> {
                     labelText: 'Celular con WhatsApp *',
                     hintText: '0991234567',
                     prefixIcon: Icon(Icons.chat_outlined),
-                    border: OutlineInputBorder(),
                   ),
                   validator: (v) => normalizarCelular(v ?? '') == null ? 'Celular no válido.' : null,
                 ),
@@ -189,7 +191,6 @@ class _EditarPerfilPageState extends State<EditarPerfilPage> {
                   decoration: const InputDecoration(
                     labelText: 'Sobre tu trabajo',
                     hintText: 'Qué haces, años de experiencia, si atiendes emergencias…',
-                    border: OutlineInputBorder(),
                     alignLabelWithHint: true,
                   ),
                 ),
@@ -200,7 +201,6 @@ class _EditarPerfilPageState extends State<EditarPerfilPage> {
                     labelText: 'Horario',
                     hintText: 'Ej.: Lun a sáb, 7:00 a 18:00',
                     prefixIcon: Icon(Icons.schedule),
-                    border: OutlineInputBorder(),
                   ),
                 ),
                 const SizedBox(height: 22),
@@ -218,6 +218,15 @@ class _EditarPerfilPageState extends State<EditarPerfilPage> {
                 Text('¿En qué parroquias trabajas? *', style: texto.titleMedium),
                 const SizedBox(height: 8),
                 Wrap(spacing: 8, runSpacing: 8, children: [
+                  FilterChip(
+                    avatar: const Icon(Icons.map_outlined, size: 18),
+                    label: const Text('Todo el cantón'),
+                    selected: todoElCanton(_parroquias, parroquias),
+                    onSelected: (s) => setState(() {
+                      _parroquias.clear();
+                      if (s) _parroquias.addAll(parroquias.map((p) => p.id));
+                    }),
+                  ),
                   for (final p in parroquias)
                     FilterChip(
                       label: Text(p.nombre),

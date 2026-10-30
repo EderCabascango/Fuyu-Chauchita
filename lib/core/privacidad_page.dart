@@ -22,22 +22,22 @@ class PrivacidadPage extends StatelessWidget {
         children: [
           Text(
             '$nombreApp es un directorio gratuito. No cobramos comisiones ni manejamos pagos: '
-            'el trato es directo entre el cliente y el maestro.',
+            'el trato es directo entre el cliente y el profesional.',
             style: texto.bodyLarge,
           ),
           titulo('Qué datos guardamos'),
           const Text(
-            '• Tu nombre y correo de Google, para identificar tu cuenta (no se muestran a nadie).\n'
-            '• Si eres maestro: el perfil que publicas (nombre, foto, oficios, zonas, horario, '
+            '• Tu nombre y correo (de Google o el que escribas), para identificar tu cuenta. No se muestran a nadie.\n'
+            '• Si eres profesional: el perfil que publicas (nombre, foto, oficios, zonas, horario, '
             'WhatsApp y fotos de trabajos).\n'
             '• Las reseñas que escribes.\n'
-            '• Cuántas veces se toca el botón de WhatsApp o llamada de cada maestro, sin '
+            '• Cuántas veces se toca el botón de WhatsApp o llamada de cada profesional, sin '
             'guardar quién lo tocó.\n'
             '• Si activas notificaciones, un identificador del teléfono para avisarte.',
           ),
           titulo('Qué es público'),
           const Text(
-            'El perfil de los maestros aprobados, incluido su número de WhatsApp, y las reseñas '
+            'El perfil de los profesionales aprobados, incluido su número de WhatsApp, y las reseñas '
             '(sin el nombre ni el correo de quien las escribe).',
           ),
           titulo('Reglas'),

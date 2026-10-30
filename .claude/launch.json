@@ -4,8 +4,26 @@
     {
       "name": "panel-admin",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8085", "--directory", "build/web"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8085",
+        "--directory",
+        "build/web"
+      ],
       "port": 8085
+    },
+    {
+      "name": "app-web",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8086",
+        "--directory",
+        "build/web_app"
+      ],
+      "port": 8086
     }
   ]
 }

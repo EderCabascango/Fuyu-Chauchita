@@ -7,7 +7,7 @@ import '../data/profesional_repositorio.dart';
 import 'editar_perfil_page.dart';
 import 'mi_perfil_page.dart';
 
-/// "Soy maestro": pide la cuenta si falta y lleva a crear o ver el perfil.
+/// "Soy profesional": pide la cuenta si falta y lleva a crear o ver el perfil.
 class EntradaProfesionalPage extends StatefulWidget {
   const EntradaProfesionalPage({super.key});
 
@@ -26,7 +26,7 @@ class _EntradaProfesionalPageState extends State<EntradaProfesionalPage> {
   }
 
   Future<void> _iniciar() async {
-    final ok = await exigirSesion(context, motivo: 'Publica tu perfil de maestro');
+    final ok = await exigirSesion(context, motivo: 'Publica tu perfil profesional');
     if (!mounted) return;
     if (!ok) {
       Navigator.pop(context);

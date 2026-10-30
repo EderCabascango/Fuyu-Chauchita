@@ -1,7 +1,8 @@
 # Ingreso con Google
 
-Maestros y clientes (para reseñar o reportar) entran con la cuenta de Google del celular.
-Es **gratis**: ni Google ni Supabase cobran por esto. Buscar y contactar maestros no pide cuenta.
+Profesionales y clientes (para reseñar o reportar) entran con la cuenta de Google del celular
+(o con un código al correo: ver [CORREO.md](CORREO.md)).
+Es **gratis**: ni Google ni Supabase cobran por esto. Buscar y contactar profesionales no pide cuenta.
 
 Datos de esta app que vas a necesitar:
 

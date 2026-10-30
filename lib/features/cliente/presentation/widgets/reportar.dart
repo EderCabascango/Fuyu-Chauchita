@@ -97,7 +97,6 @@ class _HojaReporteState extends State<_HojaReporte> {
                 maxLength: 300,
                 decoration: const InputDecoration(
                   labelText: 'Cuéntanos más (opcional)',
-                  border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 8),

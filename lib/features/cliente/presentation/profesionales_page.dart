@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/iconos_oficio.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/mensaje_error.dart';
 import '../data/cliente_repositorio.dart';
 import '../data/contacto.dart';
@@ -102,14 +104,16 @@ class _ProfesionalesPageState extends State<ProfesionalesPage> {
                           onVerTodas: () => _filtrar(null),
                         )
                       : ListView.separated(
-                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-                          itemCount: lista.length,
-                          separatorBuilder: (_, _) => const SizedBox(height: 10),
-                          itemBuilder: (context, i) => TarjetaProfesional(
-                            profesional: lista[i],
-                            onTap: () => _abrirPerfil(lista[i]),
-                            onWhatsapp: () => _whatsapp(lista[i]),
-                          ),
+                          padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
+                          itemCount: lista.length + 1,
+                          separatorBuilder: (_, _) => const SizedBox(height: 12),
+                          itemBuilder: (context, i) => i == 0
+                              ? _Resumen(oficio: widget.oficio, total: lista.length)
+                              : TarjetaProfesional(
+                                  profesional: lista[i - 1],
+                                  onTap: () => _abrirPerfil(lista[i - 1]),
+                                  onWhatsapp: () => _whatsapp(lista[i - 1]),
+                                ),
                         ),
                 );
               },
@@ -141,12 +145,12 @@ class _FiltroParroquias extends StatelessWidget {
         );
 
     return SizedBox(
-      height: 52,
+      height: 58,
       child: ListView(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
         children: [
-          chip(null, 'Todas'),
+          chip(null, 'Todo el cantón'),
           for (final p in parroquias) chip(p.id, p.nombre),
         ],
       ),
@@ -171,7 +175,7 @@ class _SinResultados extends StatelessWidget {
         Icon(Icons.person_search_rounded, size: 64, color: Theme.of(context).colorScheme.outline),
         const SizedBox(height: 16),
         Text(
-          hayFiltro ? 'Aún no hay maestros de $oficio en esta parroquia' : 'Aún no hay maestros de $oficio',
+          hayFiltro ? 'Aún no hay profesionales de $oficio en esta parroquia' : 'Aún no hay profesionales de $oficio',
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.titleMedium,
         ),
@@ -186,6 +190,37 @@ class _SinResultados extends StatelessWidget {
           Center(child: TextButton(onPressed: onVerTodas, child: const Text('Ver todo el cantón'))),
         ],
       ],
+    );
+  }
+}
+
+/// Encabezado azul con el oficio y cuántos profesionales hay.
+class _Resumen extends StatelessWidget {
+  const _Resumen({required this.oficio, required this.total});
+  final Oficio oficio;
+  final int total;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(color: AppTheme.azul, borderRadius: BorderRadius.circular(AppTheme.radio)),
+      child: Row(children: [
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(color: const Color(0x1FFFFFFF), borderRadius: BorderRadius.circular(16)),
+          child: Icon(iconoOficio(oficio.icono), color: AppTheme.naranja, size: 28),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('$total ${total == 1 ? 'profesional' : 'profesionales'}',
+                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
+            const Text('Toca el botón verde para escribir por WhatsApp.',
+                style: TextStyle(color: Colors.white70, fontSize: 13)),
+          ]),
+        ),
+      ]),
     );
   }
 }

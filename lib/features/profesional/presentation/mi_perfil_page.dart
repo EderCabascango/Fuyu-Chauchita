@@ -141,7 +141,7 @@ class _MiPerfilPageState extends State<MiPerfilPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mi perfil de maestro'),
+        title: const Text('Mi perfil profesional'),
         actions: [
           PopupMenuButton<String>(
             onSelected: _menu,

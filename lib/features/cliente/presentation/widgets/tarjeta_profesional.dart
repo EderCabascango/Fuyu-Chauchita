@@ -21,66 +21,68 @@ class TarjetaProfesional extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = profesional;
-    final texto = Theme.of(context).textTheme;
     final zonas = p.parroquias.map((z) => z.nombre).join(', ');
 
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(14, 14, 10, 14),
-          child: Row(
-            children: [
-              AvatarProfesional(profesional: p),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+    return Tarjeta(
+      onTap: onTap,
+      padding: const EdgeInsets.fromLTRB(16, 16, 12, 16),
+      child: Row(
+        children: [
+          AvatarProfesional(profesional: p, radio: 30),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   children: [
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            p.nombrePublico,
-                            style: texto.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        if (p.verificado) ...[const SizedBox(width: 4), const IconoVerificado()],
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Calificacion(promedio: p.promedioEstrellas, total: p.totalResenas),
-                    if (zonas.isNotEmpty) ...[
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Icon(Icons.place_outlined, size: 15, color: Theme.of(context).colorScheme.outline),
-                          const SizedBox(width: 2),
-                          Expanded(
-                            child: Text(zonas, style: texto.bodySmall, overflow: TextOverflow.ellipsis),
-                          ),
-                        ],
+                    Flexible(
+                      child: Text(
+                        p.nombrePublico,
+                        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppTheme.tinta),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ],
-                    if (p.disponibleAhora) ...[const SizedBox(height: 6), const InsigniaDisponible()],
+                    ),
+                    if (p.verificado) ...[const SizedBox(width: 4), const IconoVerificado()],
                   ],
                 ),
-              ),
-              IconButton.filled(
-                onPressed: onWhatsapp,
-                tooltip: 'Escribir por WhatsApp',
-                style: IconButton.styleFrom(
-                  backgroundColor: AppTheme.verdeWhatsapp,
-                  foregroundColor: Colors.white,
-                  fixedSize: const Size(48, 48),
-                ),
-                icon: const Icon(Icons.chat_rounded),
-              ),
-            ],
+                const SizedBox(height: 4),
+                Calificacion(promedio: p.promedioEstrellas, total: p.totalResenas),
+                if (zonas.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(Icons.place_outlined, size: 15, color: AppTheme.gris),
+                      const SizedBox(width: 2),
+                      Expanded(
+                        child: Text(zonas,
+                            style: const TextStyle(fontSize: 12.5, color: AppTheme.gris),
+                            overflow: TextOverflow.ellipsis),
+                      ),
+                    ],
+                  ),
+                ],
+                if (p.disponibleAhora) ...[const SizedBox(height: 8), const InsigniaDisponible()],
+              ],
+            ),
           ),
-        ),
+          const SizedBox(width: 8),
+          Material(
+            color: AppTheme.verdeWhatsapp,
+            borderRadius: BorderRadius.circular(16),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: onWhatsapp,
+              child: const Tooltip(
+                message: 'Escribir por WhatsApp',
+                child: Padding(
+                  padding: EdgeInsets.all(13),
+                  child: Icon(Icons.chat_rounded, color: Colors.white),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

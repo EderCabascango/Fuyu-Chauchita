@@ -16,12 +16,12 @@ class ClienteRepositorio {
       'oficios(id, nombre, icono), parroquias(id, nombre)';
 
   Future<List<Oficio>> oficios() async {
-    final filas = await _db.from('oficios').select('id, nombre, icono').order('orden');
+    final filas = await _db.from('oficios').select('id, nombre, icono').order('orden', ascending: true);
     return filas.map(Oficio.fromMap).toList();
   }
 
   Future<List<Parroquia>> parroquias() async {
-    final filas = await _db.from('parroquias').select('id, nombre').order('id');
+    final filas = await _db.from('parroquias').select('id, nombre').order('id', ascending: true);
     return filas.map(Parroquia.fromMap).toList();
   }
 
@@ -47,7 +47,7 @@ class ClienteRepositorio {
         .order('disponible_ahora', ascending: false)
         .order('promedio_estrellas', ascending: false)
         .order('total_resenas', ascending: false)
-        .order('nombre_publico');
+        .order('nombre_publico', ascending: true);
     return filas.map(Profesional.fromMap).toList();
   }
 

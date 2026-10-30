@@ -1,0 +1,12 @@
+{
+  "name": "oficios-cayambe-pruebas-bd",
+  "private": true,
+  "type": "module",
+  "description": "Pruebas de seguridad (RLS, triggers, límites) sobre una copia local de la base de datos",
+  "scripts": {
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "0.2.17"
+  }
+}

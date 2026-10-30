@@ -85,7 +85,6 @@ class _ResenaPageState extends State<ResenaPage> {
             decoration: const InputDecoration(
               labelText: 'Comentario (opcional)',
               hintText: '¿Fue puntual? ¿Quedó bien el trabajo? ¿Precio justo?',
-              border: OutlineInputBorder(),
               alignLabelWithHint: true,
             ),
           ),

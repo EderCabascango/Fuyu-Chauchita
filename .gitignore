@@ -58,3 +58,6 @@ android/key.properties
 *.jks
 *.keystore
 android/app/google-services.json
+
+# Pruebas de la base de datos
+node_modules/

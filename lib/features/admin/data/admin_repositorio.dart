@@ -10,7 +10,7 @@ class ProfesionalAdmin {
 
   final Profesional p;
 
-  /// Con qué entró el maestro: su correo de Google (o su celular, en cuentas antiguas).
+  /// Con qué entró el profesional: su correo de Google (o su celular, en cuentas antiguas).
   final String? cuenta;
   final String plan;
   final DateTime creadoEn;
@@ -148,8 +148,8 @@ class AdminRepositorio {
 
   // ---------------- Catálogo ----------------
 
-  Future<List<Map<String, dynamic>>> oficios() => _db.from('oficios').select().order('orden');
-  Future<List<Map<String, dynamic>>> parroquias() => _db.from('parroquias').select().order('id');
+  Future<List<Map<String, dynamic>>> oficios() => _db.from('oficios').select().order('orden', ascending: true);
+  Future<List<Map<String, dynamic>>> parroquias() => _db.from('parroquias').select().order('id', ascending: true);
 
   Future<void> guardarOficio({int? id, required String nombre, String? icono, required int orden}) {
     final datos = {'nombre': nombre.trim(), 'icono': icono?.trim(), 'orden': orden};

@@ -14,7 +14,11 @@ insert into public.oficios (nombre, icono, orden) values
   ('Pintor',                       'format_paint',        7),
   ('Cerrajero',                    'key',                 8),
   ('Soldador',                     'hardware',            9),
-  ('Técnico de electrodomésticos', 'kitchen',            10)
+  ('Técnico de electrodomésticos', 'kitchen',            10),
+  ('Cámaras de seguridad',         'videocam',           11),
+  ('Técnico en telecomunicaciones','cell_tower',         12),
+  ('Técnico en computadoras',      'computer',           13),
+  ('Taxis',                        'local_taxi',         14)
 on conflict (nombre) do nothing;
 
 insert into public.parroquias (nombre, canton) values
