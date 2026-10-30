@@ -126,6 +126,7 @@ void main() {
     test('Delivery y Arreglos florales tienen ícono', () {
       expect(iconoOficio('delivery_dining'), Icons.delivery_dining);
       expect(iconoOficio('local_florist'), Icons.local_florist);
+      expect(iconoOficio('local_laundry_service'), Icons.local_laundry_service);
     });
   });
 

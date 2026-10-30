@@ -106,7 +106,7 @@ class _CuentaPageState extends State<CuentaPage> {
             ),
           ),
           const SizedBox(height: 28),
-          Center(child: Image.asset('assets/marca/fuyu.png', height: 26, semanticLabel: 'Un producto de Fuyu')),
+          const Center(child: FirmaFuyu()),
         ],
       ),
     );

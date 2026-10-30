@@ -20,7 +20,8 @@ insert into public.oficios (nombre, icono, orden) values
   ('Técnico en computadoras',      'computer',           13),
   ('Taxis',                        'local_taxi',         14),
   ('Delivery',                     'delivery_dining',    15),
-  ('Arreglos florales',            'local_florist',      16)
+  ('Arreglos florales',            'local_florist',      16),
+  ('Técnico de lavadoras y refrigeradoras', 'local_laundry_service', 17)
 on conflict (nombre) do nothing;
 
 insert into public.parroquias (nombre, canton) values

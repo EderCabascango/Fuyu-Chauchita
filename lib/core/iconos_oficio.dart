@@ -20,6 +20,7 @@ const _iconos = <String, IconData>{
   'local_taxi': Icons.local_taxi,
   'delivery_dining': Icons.delivery_dining,
   'local_florist': Icons.local_florist,
+  'local_laundry_service': Icons.local_laundry_service,
 };
 
 IconData iconoOficio(String? nombre) => _iconos[nombre] ?? Icons.handyman;

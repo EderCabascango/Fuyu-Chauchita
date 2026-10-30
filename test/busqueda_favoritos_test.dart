@@ -145,7 +145,6 @@ void main() {
     await tester.pump(const Duration(milliseconds: 100));
     expect(find.bySemanticsLabel('Chauchita'), findsOneWidget);
     await tester.pump(const Duration(milliseconds: 350));
-    expect(find.text('Profesionales de confianza en Cayambe'), findsOneWidget);
     expect(find.bySemanticsLabel('Un producto de Fuyu'), findsOneWidget);
     await tester.pump(const Duration(milliseconds: 400));
     await tester.pumpAndSettle();

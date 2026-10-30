@@ -24,6 +24,7 @@ Formato: PNG de 512×512, **fondo transparente**, objeto centrado, mismo estilo 
 | `local_taxi.png` | Taxis |
 | `delivery_dining.png` | Delivery |
 | `local_florist.png` | Arreglos florales |
+| `local_laundry_service.png` | Técnico de lavadoras y refrigeradoras |
 
 Si agregas un oficio nuevo desde el panel admin, usa como "ícono" un nombre en minúsculas
 sin espacios (p. ej. `jardineria`) y pon aquí `jardineria.png`.
@@ -65,6 +66,7 @@ Objetos sugeridos para cada archivo:
 | `local_taxi.png` | un taxi amarillo |
 | `delivery_dining.png` | una moto de reparto con una caja |
 | `local_florist.png` | un ramo de flores |
+| `local_laundry_service.png` | una lavadora y una refrigeradora juntas con una llave |
 | `../ilustraciones/inicio.png` | una caja de herramientas abierta con casco y llave (horizontal, 800×600) |
 | `../ilustraciones/vacio.png` | una lupa con una casita (600×600) |
 | `../ilustraciones/carga.png` | una casita con una caja de herramientas (600×600) |

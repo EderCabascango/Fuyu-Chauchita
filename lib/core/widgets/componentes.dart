@@ -15,11 +15,7 @@ class PrimaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hijo = cargando
-        ? const SizedBox(
-            width: 24,
-            height: 24,
-            child: CircularProgressIndicator(strokeWidth: 2.6, color: Colors.white),
-          )
+        ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2.6, color: Colors.white))
         // Una sola línea: si no cabe, la letra se achica un poco en vez de partirse.
         : FittedBox(fit: BoxFit.scaleDown, child: Text(texto, maxLines: 1));
     return SizedBox(
@@ -88,11 +84,7 @@ class ChauchitaSearchBar extends StatelessWidget {
             child: InkWell(
               borderRadius: BorderRadius.circular(AppTheme.radioChico),
               onTap: onTap ?? () => focusNode?.requestFocus(),
-              child: const SizedBox(
-                width: 54,
-                height: 54,
-                child: Icon(Icons.tune_rounded, color: Colors.white),
-              ),
+              child: const SizedBox(width: 54, height: 54, child: Icon(Icons.tune_rounded, color: Colors.white)),
             ),
           ),
         ),
@@ -103,7 +95,14 @@ class ChauchitaSearchBar extends StatelessWidget {
 
 /// Chip de categoría con ícono. Activo: naranja relleno.
 class CategoryChip extends StatelessWidget {
-  const CategoryChip({super.key, required this.texto, this.icono, this.claveIcono, required this.activo, required this.onTap});
+  const CategoryChip({
+    super.key,
+    required this.texto,
+    this.icono,
+    this.claveIcono,
+    required this.activo,
+    required this.onTap,
+  });
 
   final String texto;
   final IconData? icono;
@@ -141,14 +140,19 @@ class CategoryChip extends StatelessWidget {
                       shape: BoxShape.circle,
                     ),
                     child: claveIcono != null
-                        ? IconoOficio(clave: claveIcono, tamano: 18, color: activo ? Colors.white : AppTheme.naranjaBoton)
-                        : Icon(icono ?? Icons.apps_rounded, size: 18, color: activo ? Colors.white : AppTheme.naranjaBoton),
+                        ? IconoOficio(
+                            clave: claveIcono,
+                            tamano: 18,
+                            color: activo ? Colors.white : AppTheme.naranjaBoton,
+                          )
+                        : Icon(
+                            icono ?? Icons.apps_rounded,
+                            size: 18,
+                            color: activo ? Colors.white : AppTheme.naranjaBoton,
+                          ),
                   ),
                   const SizedBox(width: 8),
-                  Text(
-                    texto,
-                    style: Theme.of(context).textTheme.labelLarge?.copyWith(color: colorTexto),
-                  ),
+                  Text(texto, style: Theme.of(context).textTheme.labelLarge?.copyWith(color: colorTexto)),
                 ],
               ),
             ),
@@ -195,8 +199,14 @@ class Pildora extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (icono != null) ...[Icon(icono, size: icono == Icons.circle ? 8 : 14, color: color), const SizedBox(width: 5)],
-          Text(texto, style: TextStyle(color: color, fontSize: 12.5, fontWeight: FontWeight.w700)),
+          if (icono != null) ...[
+            Icon(icono, size: icono == Icons.circle ? 8 : 14, color: color),
+            const SizedBox(width: 5),
+          ],
+          Text(
+            texto,
+            style: TextStyle(color: color, fontSize: 12.5, fontWeight: FontWeight.w700),
+          ),
         ],
       ),
     );
@@ -231,7 +241,13 @@ class MiniDato extends StatelessWidget {
 
 /// Botón redondo blanco para usar sobre fotos (volver, favorito, menú).
 class BotonCircular extends StatelessWidget {
-  const BotonCircular({super.key, required this.icono, required this.tooltip, required this.onTap, this.color = AppTheme.azul});
+  const BotonCircular({
+    super.key,
+    required this.icono,
+    required this.tooltip,
+    required this.onTap,
+    this.color = AppTheme.azul,
+  });
 
   final IconData icono;
   final String tooltip;
@@ -253,4 +269,42 @@ class BotonCircular extends StatelessWidget {
       ),
     ),
   );
+}
+
+/// Firma "un producto de Fuyu" en gris, con letra serif elegante.
+class FirmaFuyu extends StatelessWidget {
+  const FirmaFuyu({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: 'Un producto de Fuyu',
+      excludeSemantics: true,
+      child: Text.rich(
+        TextSpan(
+          children: [
+            TextSpan(
+              text: 'un producto de  ',
+              style: AppTheme.elegante(
+                const TextStyle(
+                  fontSize: 17,
+                  fontStyle: FontStyle.italic,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.gris,
+                  letterSpacing: 0.3,
+                ),
+              ),
+            ),
+            TextSpan(
+              text: 'Fuyu',
+              style: AppTheme.elegante(
+                const TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: AppTheme.gris, letterSpacing: 1.2),
+              ),
+            ),
+          ],
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
 }

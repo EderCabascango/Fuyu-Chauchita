@@ -13,6 +13,7 @@ import 'cuenta_page.dart';
 import 'favoritos_page.dart';
 import 'perfil_page.dart';
 import 'profesionales_page.dart';
+import 'widgets/boton_favorito.dart';
 import 'widgets/selector_parroquia.dart';
 import 'widgets/vacio.dart';
 import 'widgets/worker_card.dart';
@@ -197,7 +198,9 @@ class _TabInicioState extends State<_TabInicio> {
 
   void _abrirPerfil(Profesional p) => Navigator.push(
     context,
-    MaterialPageRoute(builder: (_) => PerfilPage(repo: widget.repo, resumen: p, oficio: _oficio?.nombre)),
+    MaterialPageRoute(
+      builder: (_) => PerfilPage(repo: widget.repo, resumen: p, oficio: _oficio?.nombre),
+    ),
   );
 
   @override
@@ -417,10 +420,7 @@ class _InvitacionProfesional extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '¿Ofreces un servicio?',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.white),
-          ),
+          Text('¿Ofreces un servicio?', style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.white)),
           const SizedBox(height: 6),
           const Text(
             'Publica tu perfil gratis y recibe clientes de Cayambe por WhatsApp.',
@@ -512,7 +512,7 @@ class _BarraInferior extends StatelessWidget {
           item(_Pestana.inicio, Icons.home_outlined, Icons.home_rounded, 'Inicio'),
           item(_Pestana.buscar, Icons.search_rounded, Icons.manage_search_rounded, 'Buscar'),
           const SizedBox(width: 72),
-          item(_Pestana.favoritos, Icons.favorite_border_rounded, Icons.favorite_rounded, 'Favoritos'),
+          item(_Pestana.favoritos, BotonFavorito.icono, BotonFavorito.iconoMarcado, 'Favoritos'),
           item(_Pestana.perfil, Icons.person_outline_rounded, Icons.person_rounded, 'Perfil'),
         ],
       ),

@@ -5,10 +5,11 @@ import '../data/cliente_repositorio.dart';
 import '../data/favoritos.dart';
 import '../data/modelos.dart';
 import 'perfil_page.dart';
+import 'widgets/boton_favorito.dart';
 import 'widgets/worker_card.dart';
 import 'widgets/vacio.dart';
 
-/// Profesionales guardados con el corazón.
+/// Profesionales guardados con el botón de herramientas.
 class FavoritosPage extends StatefulWidget {
   const FavoritosPage({super.key, required this.repo, required this.onExplorar});
 
@@ -97,13 +98,9 @@ class _FavoritosPageState extends State<FavoritosPage> {
                 if (lista.isEmpty) {
                   return Vacio(
                     titulo: 'Aún no tienes favoritos',
-                    texto: 'Toca el corazón en el perfil de un profesional para guardarlo aquí.',
-                    icono: Icons.favorite_border_rounded,
-                    accion: FilledButton(
-                      onPressed: widget.onExplorar,
-                      
-                      child: const Text('Explorar oficios'),
-                    ),
+                    texto: 'Toca el ícono de herramientas en un profesional para guardarlo aquí.',
+                    icono: BotonFavorito.icono,
+                    accion: FilledButton(onPressed: widget.onExplorar, child: const Text('Explorar oficios')),
                   );
                 }
                 return Column(
@@ -115,7 +112,9 @@ class _FavoritosPageState extends State<FavoritosPage> {
                           profesional: p,
                           onTap: () => Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => PerfilPage(repo: widget.repo, resumen: p)),
+                            MaterialPageRoute(
+                              builder: (_) => PerfilPage(repo: widget.repo, resumen: p),
+                            ),
                           ),
                         ),
                       ),

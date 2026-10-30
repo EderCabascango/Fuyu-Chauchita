@@ -34,7 +34,6 @@ class AppTheme {
   static const grisSuave = Color(0xFF8A8F98); // íconos y textos de ayuda
   static const verdeWhatsapp = Color(0xFF25D366);
   static const verdeDisponible = Color(0xFF0B7A3B);
-  static const rojoFavorito = Color(0xFFE5486B);
   static const error = Color(0xFFC62828);
 
   // ---- Fondos de estado ----
@@ -72,6 +71,9 @@ class AppTheme {
 
   /// Poppins. En pruebas se desactiva para no descargar la fuente.
   static bool usarPoppins = true;
+
+  /// Letra serif elegante (Cormorant Garamond) para la firma de Fuyu.
+  static TextStyle elegante(TextStyle base) => usarPoppins ? GoogleFonts.cormorantGaramond(textStyle: base) : base;
 
   static TextTheme _texto(TextTheme base) {
     final t = usarPoppins ? GoogleFonts.poppinsTextTheme(base) : base;
