@@ -8,11 +8,8 @@ class Oficio {
   final String nombre;
   final String? icono;
 
-  factory Oficio.fromMap(Map<String, dynamic> m) => Oficio(
-        id: m['id'] as int,
-        nombre: m['nombre'] as String,
-        icono: m['icono'] as String?,
-      );
+  factory Oficio.fromMap(Map<String, dynamic> m) =>
+      Oficio(id: m['id'] as int, nombre: m['nombre'] as String, icono: m['icono'] as String?);
 }
 
 class Parroquia {
@@ -21,8 +18,7 @@ class Parroquia {
   final int id;
   final String nombre;
 
-  factory Parroquia.fromMap(Map<String, dynamic> m) =>
-      Parroquia(id: m['id'] as int, nombre: m['nombre'] as String);
+  factory Parroquia.fromMap(Map<String, dynamic> m) => Parroquia(id: m['id'] as int, nombre: m['nombre'] as String);
 }
 
 class FotoTrabajo {
@@ -32,21 +28,12 @@ class FotoTrabajo {
   final String url;
   final int orden;
 
-  factory FotoTrabajo.fromMap(Map<String, dynamic> m) => FotoTrabajo(
-        id: m['id'] as String,
-        url: m['url'] as String,
-        orden: (m['orden'] as num?)?.toInt() ?? 0,
-      );
+  factory FotoTrabajo.fromMap(Map<String, dynamic> m) =>
+      FotoTrabajo(id: m['id'] as String, url: m['url'] as String, orden: (m['orden'] as num?)?.toInt() ?? 0);
 }
 
 class Resena {
-  const Resena({
-    required this.id,
-    required this.estrellas,
-    this.comentario,
-    required this.creadoEn,
-    this.clienteId,
-  });
+  const Resena({required this.id, required this.estrellas, this.comentario, required this.creadoEn, this.clienteId});
 
   final String id;
   final int estrellas;
@@ -55,12 +42,12 @@ class Resena {
   final String? clienteId;
 
   factory Resena.fromMap(Map<String, dynamic> m) => Resena(
-        id: m['id'] as String,
-        estrellas: (m['estrellas'] as num).toInt(),
-        comentario: m['comentario'] as String?,
-        creadoEn: DateTime.parse(m['creado_en'] as String),
-        clienteId: m['cliente_id'] as String?,
-      );
+    id: m['id'] as String,
+    estrellas: (m['estrellas'] as num).toInt(),
+    comentario: m['comentario'] as String?,
+    creadoEn: DateTime.parse(m['creado_en'] as String),
+    clienteId: m['cliente_id'] as String?,
+  );
 }
 
 class Profesional {
@@ -104,8 +91,8 @@ class Profesional {
 
   factory Profesional.fromMap(Map<String, dynamic> m) {
     List<T> lista<T>(String clave, T Function(Map<String, dynamic>) desde) => [
-          for (final e in (m[clave] as List?) ?? const []) desde(e as Map<String, dynamic>),
-        ];
+      for (final e in (m[clave] as List?) ?? const []) desde(e as Map<String, dynamic>),
+    ];
 
     return Profesional(
       id: m['id'] as String,

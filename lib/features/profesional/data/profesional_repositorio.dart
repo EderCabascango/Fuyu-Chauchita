@@ -25,11 +25,11 @@ class DatosPerfil {
   final Set<int> parroquiaIds;
 
   Map<String, dynamic> toMap() => {
-        'nombre_publico': nombrePublico.trim(),
-        'whatsapp': whatsapp,
-        'descripcion': _vacioANull(descripcion),
-        'horario': _vacioANull(horario),
-      };
+    'nombre_publico': nombrePublico.trim(),
+    'whatsapp': whatsapp,
+    'descripcion': _vacioANull(descripcion),
+    'horario': _vacioANull(horario),
+  };
 
   static String? _vacioANull(String? s) => (s == null || s.trim().isEmpty) ? null : s.trim();
 }
@@ -48,10 +48,12 @@ class ProfesionalRepositorio {
   Future<Profesional?> miPerfil() async {
     final fila = await _db
         .from('profesionales')
-        .select('id, nombre_publico, foto_url, descripcion, whatsapp, horario, '
-            'disponible_ahora, verificado, promedio_estrellas, total_resenas, estado, '
-            'oficios(id, nombre, icono), parroquias(id, nombre), '
-            'fotos_trabajo(id, url, orden), resenas(id, estrellas, comentario, creado_en)')
+        .select(
+          'id, nombre_publico, foto_url, descripcion, whatsapp, horario, '
+          'disponible_ahora, verificado, promedio_estrellas, total_resenas, estado, '
+          'oficios(id, nombre, icono), parroquias(id, nombre), '
+          'fotos_trabajo(id, url, orden), resenas(id, estrellas, comentario, creado_en)',
+        )
         .eq('usuario_id', _uid)
         .maybeSingle();
     return fila == null ? null : Profesional.fromMap(fila);

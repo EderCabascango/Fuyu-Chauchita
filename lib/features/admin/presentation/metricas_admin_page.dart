@@ -18,9 +18,9 @@ class _MetricasAdminPageState extends State<MetricasAdminPage> {
   late Future<Map<String, dynamic>> _datos = widget.repo.metricas(dias: _dias);
 
   void _cambiar(int dias) => setState(() {
-        _dias = dias;
-        _datos = widget.repo.metricas(dias: dias);
-      });
+    _dias = dias;
+    _datos = widget.repo.metricas(dias: dias);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -51,37 +51,57 @@ class _MetricasAdminPageState extends State<MetricasAdminPage> {
               onSelectionChanged: (v) => _cambiar(v.first),
             ),
             const SizedBox(height: 16),
-            Wrap(spacing: 12, runSpacing: 12, children: [
-              _Tarjeta('Contactos', '$contactos', '${n('contactos_whatsapp')} WhatsApp · ${n('contactos_llamada')} llamadas'),
-              _Tarjeta('Contactos esta semana', '${n('contactos_7_dias')}', 'últimos 7 días'),
-              _Tarjeta('Profesionales activos', '${n('profesionales_activos')}',
-                  'de ${n('profesionales_aprobados')} aprobados, con ≥1 contacto'),
-              _Tarjeta('Reseñas por contacto', tasaResenas, '${n('resenas')} reseñas'),
-              _Tarjeta('Por aprobar', '${n('profesionales_pendientes')}', 'perfiles pendientes'),
-              _Tarjeta('Reportes', '${n('reportes_pendientes')}', 'pendientes'),
-            ]),
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: [
+                _Tarjeta(
+                  'Contactos',
+                  '$contactos',
+                  '${n('contactos_whatsapp')} WhatsApp · ${n('contactos_llamada')} llamadas',
+                ),
+                _Tarjeta('Contactos esta semana', '${n('contactos_7_dias')}', 'últimos 7 días'),
+                _Tarjeta(
+                  'Profesionales activos',
+                  '${n('profesionales_activos')}',
+                  'de ${n('profesionales_aprobados')} aprobados, con ≥1 contacto',
+                ),
+                _Tarjeta('Reseñas por contacto', tasaResenas, '${n('resenas')} reseñas'),
+                _Tarjeta('Por aprobar', '${n('profesionales_pendientes')}', 'perfiles pendientes'),
+                _Tarjeta('Reportes', '${n('reportes_pendientes')}', 'pendientes'),
+              ],
+            ),
             const SizedBox(height: 24),
             Text('Por oficio', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 8),
             Card(
-              child: DataTable(columns: const [
-                DataColumn(label: Text('Oficio')),
-                DataColumn(label: Text('Profesionales'), numeric: true),
-                DataColumn(label: Text('Contactos'), numeric: true),
-              ], rows: [
-                for (final o in porOficio)
-                  DataRow(cells: [
-                    DataCell(Text('${o['nombre']}')),
-                    DataCell(Text('${o['profesionales']}')),
-                    DataCell(Text('${o['contactos']}')),
-                  ]),
-              ]),
+              child: DataTable(
+                columns: const [
+                  DataColumn(label: Text('Oficio')),
+                  DataColumn(label: Text('Profesionales'), numeric: true),
+                  DataColumn(label: Text('Contactos'), numeric: true),
+                ],
+                rows: [
+                  for (final o in porOficio)
+                    DataRow(
+                      cells: [
+                        DataCell(Text('${o['nombre']}')),
+                        DataCell(Text('${o['profesionales']}')),
+                        DataCell(Text('${o['contactos']}')),
+                      ],
+                    ),
+                ],
+              ),
             ),
             const SizedBox(height: 24),
-            Text('Cobertura (profesionales aprobados por oficio y parroquia)',
-                style: Theme.of(context).textTheme.titleMedium),
-            Text('En rojo: menos de 2 profesionales. Meta de lanzamiento: al menos 3 por oficio en Cayambe urbano.',
-                style: Theme.of(context).textTheme.bodySmall),
+            Text(
+              'Cobertura (profesionales aprobados por oficio y parroquia)',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            Text(
+              'En rojo: menos de 2 profesionales. Meta de lanzamiento: al menos 3 por oficio en Cayambe urbano.',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
             const SizedBox(height: 8),
             _MatrizCobertura(datos: cobertura),
           ],
@@ -99,19 +119,21 @@ class _Tarjeta extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-        width: 230,
-        child: Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(titulo, style: Theme.of(context).textTheme.bodyMedium),
-              Text(valor,
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800)),
-              Text(pie, style: Theme.of(context).textTheme.bodySmall),
-            ]),
-          ),
+    width: 230,
+    child: Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(titulo, style: Theme.of(context).textTheme.bodyMedium),
+            Text(valor, style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800)),
+            Text(pie, style: Theme.of(context).textTheme.bodySmall),
+          ],
         ),
-      );
+      ),
+    ),
+  );
 }
 
 class _MatrizCobertura extends StatelessWidget {
@@ -135,17 +157,21 @@ class _MatrizCobertura extends StatelessWidget {
           ],
           rows: [
             for (final o in oficios)
-              DataRow(cells: [
-                DataCell(Text(o)),
-                for (final p in parroquias)
-                  DataCell(Text(
-                    '${valor['$o|$p'] ?? 0}',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      color: (valor['$o|$p'] ?? 0) < 2 ? const Color(0xFFB3261E) : const Color(0xFF0B7A3B),
+              DataRow(
+                cells: [
+                  DataCell(Text(o)),
+                  for (final p in parroquias)
+                    DataCell(
+                      Text(
+                        '${valor['$o|$p'] ?? 0}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: (valor['$o|$p'] ?? 0) < 2 ? const Color(0xFFB3261E) : const Color(0xFF0B7A3B),
+                        ),
+                      ),
                     ),
-                  )),
-              ]),
+                ],
+              ),
           ],
         ),
       ),

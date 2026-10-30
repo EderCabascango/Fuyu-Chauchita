@@ -9,6 +9,7 @@ import '../data/contacto.dart';
 import '../data/modelos.dart';
 import 'resena_page.dart';
 import 'widgets/avatar_profesional.dart';
+import 'widgets/boton_favorito.dart';
 import 'widgets/estrellas.dart';
 import 'widgets/insignias.dart';
 import 'widgets/reportar.dart';
@@ -16,13 +17,7 @@ import 'widgets/reportar.dart';
 /// Perfil público de un profesional. Muestra de inmediato los datos de la
 /// lista (`resumen`) y completa fotos y reseñas al cargar.
 class PerfilPage extends StatefulWidget {
-  const PerfilPage({
-    super.key,
-    required this.repo,
-    required this.resumen,
-    this.oficio,
-    this.vistaPrevia = false,
-  });
+  const PerfilPage({super.key, required this.repo, required this.resumen, this.oficio, this.vistaPrevia = false});
 
   final ClienteRepositorio repo;
   final Profesional resumen;
@@ -40,7 +35,9 @@ class PerfilPage extends StatefulWidget {
 class _PerfilPageState extends State<PerfilPage> {
   late Future<Profesional?> _perfil = widget.repo.perfil(widget.resumen.id);
 
-  void _recargar() => setState(() => _perfil = widget.repo.perfil(widget.resumen.id));
+  void _recargar() => setState(() {
+    _perfil = widget.repo.perfil(widget.resumen.id);
+  });
 
   Future<void> _calificar(Profesional p) async {
     if (!await exigirSesion(context, motivo: 'Para dejar una reseña necesitas una cuenta')) return;
@@ -51,7 +48,9 @@ class _PerfilPageState extends State<PerfilPage> {
     if (!mounted) return;
     final cambio = await Navigator.push<bool>(
       context,
-      MaterialPageRoute(builder: (_) => ResenaPage(repo: widget.repo, profesional: p, actual: actual)),
+      MaterialPageRoute(
+        builder: (_) => ResenaPage(repo: widget.repo, profesional: p, actual: actual),
+      ),
     );
     if (cambio == true) _recargar();
   }
@@ -59,11 +58,15 @@ class _PerfilPageState extends State<PerfilPage> {
   Future<void> _contactar(Profesional p, CanalContacto canal) async {
     final ok = await contactar(widget.repo, p, canal, oficio: widget.oficio);
     if (!ok && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(canal == CanalContacto.whatsapp
-            ? 'No se pudo abrir WhatsApp. ¿Está instalado?'
-            : 'No se pudo abrir el teléfono.'),
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            canal == CanalContacto.whatsapp
+                ? 'No se pudo abrir WhatsApp. ¿Está instalado?'
+                : 'No se pudo abrir el teléfono.',
+          ),
+        ),
+      );
     }
   }
 
@@ -80,7 +83,9 @@ class _PerfilPageState extends State<PerfilPage> {
         if (!cargando && snapshot.hasError) {
           cuerpo = MensajeError(
             mensaje: 'No pudimos cargar el perfil.',
-            onReintentar: () => setState(() => _perfil = widget.repo.perfil(widget.resumen.id)),
+            onReintentar: () => setState(() {
+              _perfil = widget.repo.perfil(widget.resumen.id);
+            }),
           );
         } else if (!cargando && completo == null) {
           cuerpo = const MensajeError(mensaje: 'Este perfil ya no está disponible.');
@@ -98,13 +103,11 @@ class _PerfilPageState extends State<PerfilPage> {
           appBar: AppBar(
             title: widget.vistaPrevia ? const Text('Así te ven los clientes') : null,
             actions: [
+              if (!widget.vistaPrevia) BotonFavorito(profesionalId: p.id),
               if (!widget.vistaPrevia)
                 PopupMenuButton<String>(
-                  onSelected: (_) =>
-                      reportar(context, repo: widget.repo, tipo: TipoReporte.perfil, objetivoId: p.id),
-                  itemBuilder: (_) => const [
-                    PopupMenuItem(value: 'reportar', child: Text('Reportar perfil')),
-                  ],
+                  onSelected: (_) => reportar(context, repo: widget.repo, tipo: TipoReporte.perfil, objetivoId: p.id),
+                  itemBuilder: (_) => const [PopupMenuItem(value: 'reportar', child: Text('Reportar perfil'))],
                 ),
             ],
           ),
@@ -163,17 +166,19 @@ class _ContenidoPerfil extends StatelessWidget {
         if ((p.horario ?? '').isNotEmpty || p.parroquias.isNotEmpty) ...[
           const _Titulo('Datos'),
           Tarjeta(
-            child: Column(children: [
-              if ((p.horario ?? '').isNotEmpty)
-                _Dato(icono: Icons.schedule_rounded, titulo: 'Horario', texto: p.horario!),
-              if ((p.horario ?? '').isNotEmpty && p.parroquias.isNotEmpty) const Divider(height: 24),
-              if (p.parroquias.isNotEmpty)
-                _Dato(
-                  icono: Icons.place_outlined,
-                  titulo: 'Zonas que cubre',
-                  texto: p.parroquias.map((z) => z.nombre).join(', '),
-                ),
-            ]),
+            child: Column(
+              children: [
+                if ((p.horario ?? '').isNotEmpty)
+                  _Dato(icono: Icons.schedule_rounded, titulo: 'Horario', texto: p.horario!),
+                if ((p.horario ?? '').isNotEmpty && p.parroquias.isNotEmpty) const Divider(height: 24),
+                if (p.parroquias.isNotEmpty)
+                  _Dato(
+                    icono: Icons.place_outlined,
+                    titulo: 'Zonas que cubre',
+                    texto: p.parroquias.map((z) => z.nombre).join(', '),
+                  ),
+              ],
+            ),
           ),
         ],
 
@@ -211,9 +216,11 @@ class _ContenidoPerfil extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: onCalificar,
               icon: const Icon(Icons.star_outline_rounded),
-              label: Text(p.resenas.any((r) => r.clienteId != null && r.clienteId == usuarioActual?.id)
-                  ? 'Editar tu reseña'
-                  : '¿Te atendió? Califícalo'),
+              label: Text(
+                p.resenas.any((r) => r.clienteId != null && r.clienteId == usuarioActual?.id)
+                    ? 'Editar tu reseña'
+                    : '¿Te atendió? Califícalo',
+              ),
             ),
             const SizedBox(height: 12),
           ],
@@ -234,7 +241,10 @@ class _ContenidoPerfil extends StatelessWidget {
   void _verFotos(BuildContext context, List<FotoTrabajo> fotos, int inicial) {
     Navigator.push(
       context,
-      MaterialPageRoute(fullscreenDialog: true, builder: (_) => _VisorFotos(fotos: fotos, inicial: inicial)),
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (_) => _VisorFotos(fotos: fotos, inicial: inicial),
+      ),
     );
   }
 }
@@ -245,9 +255,9 @@ class _Titulo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(top: 24, bottom: 10),
-        child: Text(texto, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 18)),
-      );
+    padding: const EdgeInsets.only(top: 24, bottom: 10),
+    child: Text(texto, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 18)),
+  );
 }
 
 class _Dato extends StatelessWidget {
@@ -258,23 +268,29 @@ class _Dato extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(9),
-            decoration: BoxDecoration(color: AppTheme.durazno, borderRadius: BorderRadius.circular(12)),
-            child: Icon(icono, size: 20, color: const Color(0xFFD9822B)),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(titulo, style: const TextStyle(fontSize: 12.5, color: AppTheme.gris, fontWeight: FontWeight.w600)),
-              const SizedBox(height: 2),
-              Text(texto, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
-            ]),
-          ),
-        ],
-      );
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Container(
+        padding: const EdgeInsets.all(9),
+        decoration: BoxDecoration(color: AppTheme.lila, borderRadius: BorderRadius.circular(12)),
+        child: Icon(icono, size: 20, color: const Color(0xFF6A3FD8)),
+      ),
+      const SizedBox(width: 12),
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              titulo,
+              style: const TextStyle(fontSize: 12.5, color: AppTheme.gris, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 2),
+            Text(texto, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+          ],
+        ),
+      ),
+    ],
+  );
 }
 
 class _Aviso extends StatelessWidget {
@@ -284,19 +300,16 @@ class _Aviso extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: const Color(0xFFE8F0FE),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Icon(icono, color: const Color(0xFF1A73E8)),
-            const SizedBox(width: 10),
-            Expanded(child: Text(texto)),
-          ],
-        ),
-      );
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(color: const Color(0xFFE8F0FE), borderRadius: BorderRadius.circular(12)),
+    child: Row(
+      children: [
+        Icon(icono, color: const Color(0xFF1A73E8)),
+        const SizedBox(width: 10),
+        Expanded(child: Text(texto)),
+      ],
+    ),
+  );
 }
 
 class _TarjetaResena extends StatelessWidget {
@@ -315,40 +328,42 @@ class _TarjetaResena extends StatelessWidget {
       child: Tarjeta(
         padding: const EdgeInsets.all(16),
         child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  FilaEstrellas(estrellas: resena.estrellas),
-                  if (esMia) ...[
-                    const SizedBox(width: 8),
-                    Text('Tu reseña',
-                        style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: Theme.of(context).colorScheme.primary)),
-                  ],
-                  const Spacer(),
-                  Text('${f.day} ${_meses[f.month - 1]} ${f.year}',
-                      style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.outline)),
-                  if (onReportar != null && !esMia)
-                    SizedBox(
-                      width: 32,
-                      height: 24,
-                      child: PopupMenuButton<String>(
-                        padding: EdgeInsets.zero,
-                        iconSize: 18,
-                        onSelected: (_) => onReportar!(),
-                        itemBuilder: (_) => const [PopupMenuItem(value: 'r', child: Text('Reportar reseña'))],
-                      ),
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                FilaEstrellas(estrellas: resena.estrellas),
+                if (esMia) ...[
+                  const SizedBox(width: 8),
+                  Text(
+                    'Tu reseña',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
+                  ),
                 ],
-              ),
-              if ((resena.comentario ?? '').isNotEmpty) ...[
-                const SizedBox(height: 8),
-                Text(resena.comentario!),
+                const Spacer(),
+                Text(
+                  '${f.day} ${_meses[f.month - 1]} ${f.year}',
+                  style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.outline),
+                ),
+                if (onReportar != null && !esMia)
+                  SizedBox(
+                    width: 32,
+                    height: 24,
+                    child: PopupMenuButton<String>(
+                      padding: EdgeInsets.zero,
+                      iconSize: 18,
+                      onSelected: (_) => onReportar!(),
+                      itemBuilder: (_) => const [PopupMenuItem(value: 'r', child: Text('Reportar reseña'))],
+                    ),
+                  ),
               ],
-            ],
+            ),
+            if ((resena.comentario ?? '').isNotEmpty) ...[const SizedBox(height: 8), Text(resena.comentario!)],
+          ],
         ),
       ),
     );
@@ -362,14 +377,14 @@ class _Imagen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => CachedNetworkImage(
-        imageUrl: url,
-        fit: fit,
-        placeholder: (_, _) => Container(color: Theme.of(context).colorScheme.surfaceContainerHighest),
-        errorWidget: (_, _, _) => Container(
-          color: Theme.of(context).colorScheme.surfaceContainerHighest,
-          child: const Icon(Icons.broken_image_outlined),
-        ),
-      );
+    imageUrl: url,
+    fit: fit,
+    placeholder: (_, _) => Container(color: Theme.of(context).colorScheme.surfaceContainerHighest),
+    errorWidget: (_, _, _) => Container(
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+      child: const Icon(Icons.broken_image_outlined),
+    ),
+  );
 }
 
 class _VisorFotos extends StatelessWidget {
@@ -386,7 +401,9 @@ class _VisorFotos extends StatelessWidget {
         controller: PageController(initialPage: inicial),
         itemCount: fotos.length,
         itemBuilder: (_, i) => InteractiveViewer(
-          child: Center(child: _Imagen(url: fotos[i].url, fit: BoxFit.contain)),
+          child: Center(
+            child: _Imagen(url: fotos[i].url, fit: BoxFit.contain),
+          ),
         ),
       ),
     );
@@ -404,7 +421,7 @@ class _BotonesContacto extends StatelessWidget {
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-        boxShadow: [BoxShadow(color: Color(0x141F4B5A), blurRadius: 20, offset: Offset(0, -4))],
+        boxShadow: [BoxShadow(color: Color(0x146A3FD8), blurRadius: 20, offset: Offset(0, -4))],
       ),
       child: SafeArea(
         top: false,
@@ -449,73 +466,84 @@ class _Cabecera extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 22),
       decoration: BoxDecoration(
-        color: AppTheme.azul,
+        gradient: AppTheme.degradado,
         borderRadius: BorderRadius.circular(28),
-        boxShadow: const [BoxShadow(color: Color(0x331F4B5A), blurRadius: 24, offset: Offset(0, 10))],
+        boxShadow: const [BoxShadow(color: Color(0x336A3FD8), blurRadius: 24, offset: Offset(0, 10))],
       ),
-      child: Column(children: [
-        Container(
-          padding: const EdgeInsets.all(4),
-          decoration: const BoxDecoration(color: AppTheme.naranja, shape: BoxShape.circle),
-          child: AvatarProfesional(profesional: p, radio: 48),
-        ),
-        const SizedBox(height: 14),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Flexible(
-              child: Text(
-                p.nombrePublico,
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white, fontSize: 23, fontWeight: FontWeight.w800),
-              ),
-            ),
-            if (p.verificado) ...[
-              const SizedBox(width: 6),
-              const Tooltip(
-                message: 'Verificado: cédula y referencias revisadas',
-                child: Icon(Icons.verified_rounded, color: Color(0xFF7CC4FF), size: 24),
-              ),
-            ],
-          ],
-        ),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(color: const Color(0x1FFFFFFF), borderRadius: BorderRadius.circular(20)),
-          child: p.totalResenas == 0
-              ? const Text('Sin reseñas aún', style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w600))
-              : Row(mainAxisSize: MainAxisSize.min, children: [
-                  const Icon(Icons.star_rounded, color: AppTheme.naranja, size: 20),
-                  const SizedBox(width: 4),
-                  Text(p.promedioEstrellas.toStringAsFixed(1),
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
-                  Text('  ·  ${p.totalResenas} ${p.totalResenas == 1 ? 'reseña' : 'reseñas'}',
-                      style: const TextStyle(color: Colors.white70)),
-                ]),
-        ),
-        if (p.disponibleAhora) ...[
-          const SizedBox(height: 10),
-          const InsigniaDisponible(sobreOscuro: true),
-        ],
-        if (p.oficios.isNotEmpty) ...[
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(4),
+            decoration: const BoxDecoration(color: AppTheme.acento, shape: BoxShape.circle),
+            child: AvatarProfesional(profesional: p, radio: 48),
+          ),
           const SizedBox(height: 14),
-          Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 8,
-            runSpacing: 8,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              for (final o in p.oficios)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                  decoration: BoxDecoration(color: AppTheme.durazno, borderRadius: BorderRadius.circular(20)),
-                  child: Text(o.nombre,
-                      style: const TextStyle(color: Color(0xFF6B4210), fontWeight: FontWeight.w700, fontSize: 13)),
+              Flexible(
+                child: Text(
+                  p.nombrePublico,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white, fontSize: 23, fontWeight: FontWeight.w800),
                 ),
+              ),
+              if (p.verificado) ...[
+                const SizedBox(width: 6),
+                const Tooltip(
+                  message: 'Verificado: cédula y referencias revisadas',
+                  child: Icon(Icons.verified_rounded, color: Color(0xFFFFC94A), size: 24),
+                ),
+              ],
             ],
           ),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(color: const Color(0x1FFFFFFF), borderRadius: BorderRadius.circular(20)),
+            child: p.totalResenas == 0
+                ? const Text(
+                    'Sin reseñas aún',
+                    style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w600),
+                  )
+                : Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.star_rounded, color: AppTheme.acento, size: 20),
+                      const SizedBox(width: 4),
+                      Text(
+                        p.promedioEstrellas.toStringAsFixed(1),
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+                      ),
+                      Text(
+                        '  ·  ${p.totalResenas} ${p.totalResenas == 1 ? 'reseña' : 'reseñas'}',
+                        style: const TextStyle(color: Colors.white70),
+                      ),
+                    ],
+                  ),
+          ),
+          if (p.disponibleAhora) ...[const SizedBox(height: 10), const InsigniaDisponible(sobreOscuro: true)],
+          if (p.oficios.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final o in p.oficios)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                    decoration: BoxDecoration(color: AppTheme.lila, borderRadius: BorderRadius.circular(20)),
+                    child: Text(
+                      o.nombre,
+                      style: const TextStyle(color: Color(0xFF4A2A9C), fontWeight: FontWeight.w700, fontSize: 13),
+                    ),
+                  ),
+              ],
+            ),
+          ],
         ],
-      ]),
+      ),
     );
   }
 }

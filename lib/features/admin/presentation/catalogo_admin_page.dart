@@ -20,7 +20,9 @@ class _CatalogoAdminPageState extends State<CatalogoAdminPage> {
   Future<(List<Map<String, dynamic>>, List<Map<String, dynamic>>)> _cargar() async =>
       (await widget.repo.oficios(), await widget.repo.parroquias());
 
-  void _recargar() => setState(() => _datos = _cargar());
+  void _recargar() => setState(() {
+    _datos = _cargar();
+  });
 
   Future<void> _ejecutar(Future<void> Function() f) async {
     try {
@@ -41,16 +43,19 @@ class _CatalogoAdminPageState extends State<CatalogoAdminPage> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(titulo),
-        content: Column(mainAxisSize: MainAxisSize.min, children: [
-          for (final e in ctrls.entries)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: TextField(
-                controller: e.value,
-                decoration: InputDecoration(labelText: e.key, border: const OutlineInputBorder()),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final e in ctrls.entries)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: TextField(
+                  controller: e.value,
+                  decoration: InputDecoration(labelText: e.key, border: const OutlineInputBorder()),
+                ),
               ),
-            ),
-        ]),
+          ],
+        ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
           FilledButton(
@@ -69,12 +74,14 @@ class _CatalogoAdminPageState extends State<CatalogoAdminPage> {
       'Orden': '${o?['orden'] ?? 99}',
     });
     if (r == null || r['Nombre']!.trim().isEmpty) return;
-    await _ejecutar(() => widget.repo.guardarOficio(
-          id: o?['id'] as int?,
-          nombre: r['Nombre']!,
-          icono: r['Ícono (Material, ej. plumbing)'],
-          orden: int.tryParse(r['Orden']!) ?? 99,
-        ));
+    await _ejecutar(
+      () => widget.repo.guardarOficio(
+        id: o?['id'] as int?,
+        nombre: r['Nombre']!,
+        icono: r['Ícono (Material, ej. plumbing)'],
+        orden: int.tryParse(r['Orden']!) ?? 99,
+      ),
+    );
   }
 
   Future<void> _editarParroquia([Map<String, dynamic>? p]) async {
@@ -83,7 +90,9 @@ class _CatalogoAdminPageState extends State<CatalogoAdminPage> {
       'Cantón': p?['canton'] as String? ?? 'Cayambe',
     });
     if (r == null || r['Nombre']!.trim().isEmpty) return;
-    await _ejecutar(() => widget.repo.guardarParroquia(id: p?['id'] as int?, nombre: r['Nombre']!, canton: r['Cantón']!));
+    await _ejecutar(
+      () => widget.repo.guardarParroquia(id: p?['id'] as int?, nombre: r['Nombre']!, canton: r['Cantón']!),
+    );
   }
 
   Future<bool> _confirmar(String nombre) async =>
@@ -109,59 +118,78 @@ class _CatalogoAdminPageState extends State<CatalogoAdminPage> {
         final (oficios, parroquias) = s.data!;
 
         Widget seccion(String titulo, VoidCallback agregar, List<Widget> filas) => Card(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                ListTile(
-                  title: Text(titulo, style: Theme.of(context).textTheme.titleMedium),
-                  trailing: FilledButton.tonalIcon(onPressed: agregar, icon: const Icon(Icons.add), label: const Text('Agregar')),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ListTile(
+                title: Text(titulo, style: Theme.of(context).textTheme.titleMedium),
+                trailing: FilledButton.tonalIcon(
+                  onPressed: agregar,
+                  icon: const Icon(Icons.add),
+                  label: const Text('Agregar'),
                 ),
-                ...filas,
-              ]),
-            );
+              ),
+              ...filas,
+            ],
+          ),
+        );
 
-        return ListView(padding: const EdgeInsets.all(16), children: [
-          seccion('Oficios', _editarOficio, [
-            for (final o in oficios)
-              ListTile(
-                leading: Icon(iconoOficio(o['icono'] as String?)),
-                title: Text('${o['nombre']}'),
-                subtitle: Text('orden ${o['orden']} · ícono ${o['icono'] ?? '—'}'),
-                trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                  IconButton(icon: const Icon(Icons.edit_outlined), onPressed: () => _editarOficio(o)),
-                  IconButton(
-                    icon: const Icon(Icons.delete_outline),
-                    onPressed: () async {
-                      if (await _confirmar('${o['nombre']}')) {
-                        await _ejecutar(() => widget.repo.borrarOficio(o['id'] as int));
-                      }
-                    },
+        return ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            seccion('Oficios', _editarOficio, [
+              for (final o in oficios)
+                ListTile(
+                  leading: IconoOficio(clave: o['icono'] as String?, tamano: 24),
+                  title: Text('${o['nombre']}'),
+                  subtitle: Text('orden ${o['orden']} · ícono ${o['icono'] ?? '—'}'),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(icon: const Icon(Icons.edit_outlined), onPressed: () => _editarOficio(o)),
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline),
+                        onPressed: () async {
+                          if (await _confirmar('${o['nombre']}')) {
+                            await _ejecutar(() => widget.repo.borrarOficio(o['id'] as int));
+                          }
+                        },
+                      ),
+                    ],
                   ),
-                ]),
-              ),
-          ]),
-          const SizedBox(height: 16),
-          seccion('Parroquias', _editarParroquia, [
-            for (final p in parroquias)
-              ListTile(
-                leading: const Icon(Icons.place_outlined),
-                title: Text('${p['nombre']}'),
-                subtitle: Text('Cantón ${p['canton']}'),
-                trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                  IconButton(icon: const Icon(Icons.edit_outlined), onPressed: () => _editarParroquia(p)),
-                  IconButton(
-                    icon: const Icon(Icons.delete_outline),
-                    onPressed: () async {
-                      if (await _confirmar('${p['nombre']}')) {
-                        await _ejecutar(() => widget.repo.borrarParroquia(p['id'] as int));
-                      }
-                    },
+                ),
+            ]),
+            const SizedBox(height: 16),
+            seccion('Parroquias', _editarParroquia, [
+              for (final p in parroquias)
+                ListTile(
+                  leading: const Icon(Icons.place_outlined),
+                  title: Text('${p['nombre']}'),
+                  subtitle: Text('Cantón ${p['canton']}'),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(icon: const Icon(Icons.edit_outlined), onPressed: () => _editarParroquia(p)),
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline),
+                        onPressed: () async {
+                          if (await _confirmar('${p['nombre']}')) {
+                            await _ejecutar(() => widget.repo.borrarParroquia(p['id'] as int));
+                          }
+                        },
+                      ),
+                    ],
                   ),
-                ]),
-              ),
-          ]),
-          const SizedBox(height: 8),
-          Text('Los íconos nuevos deben existir también en lib/core/iconos_oficio.dart; '
-              'si no, la app muestra uno genérico.', style: Theme.of(context).textTheme.bodySmall),
-        ]);
+                ),
+            ]),
+            const SizedBox(height: 8),
+            Text(
+              'Los íconos nuevos deben existir también en lib/core/iconos_oficio.dart; '
+              'si no, la app muestra uno genérico.',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ],
+        );
       },
     );
   }

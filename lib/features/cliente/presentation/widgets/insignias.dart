@@ -17,15 +17,21 @@ class InsigniaDisponible extends StatelessWidget {
         color: sobreOscuro ? const Color(0x3325D366) : AppTheme.verdeWhatsapp.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Row(mainAxisSize: MainAxisSize.min, children: [
-        Container(
-          width: 7,
-          height: 7,
-          decoration: const BoxDecoration(color: AppTheme.verdeWhatsapp, shape: BoxShape.circle),
-        ),
-        const SizedBox(width: 6),
-        Text('Disponible ahora', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: colorTexto)),
-      ]),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 7,
+            height: 7,
+            decoration: const BoxDecoration(color: AppTheme.verdeWhatsapp, shape: BoxShape.circle),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            'Disponible ahora',
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: colorTexto),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -17,7 +17,9 @@ class ReportesAdminPage extends StatefulWidget {
 class _ReportesAdminPageState extends State<ReportesAdminPage> {
   late Future<List<Reporte>> _lista = widget.repo.reportes();
 
-  void _recargar() => setState(() => _lista = widget.repo.reportes());
+  void _recargar() => setState(() {
+    _lista = widget.repo.reportes();
+  });
 
   Future<void> _accion(List<Future<void> Function()> pasos, String exito) async {
     try {
@@ -65,13 +67,15 @@ class _ReportesAdminPageState extends State<ReportesAdminPage> {
       detalle = const Text('El contenido reportado ya no existe.');
       acciones = [];
     } else if (r.tipo == 'perfil') {
-      detalle = Text('Perfil: ${o['nombre_publico']} (${o['estado']})',
-          style: const TextStyle(fontWeight: FontWeight.w600));
+      detalle = Text(
+        'Perfil: ${o['nombre_publico']} (${o['estado']})',
+        style: const TextStyle(fontWeight: FontWeight.w600),
+      );
       acciones = [
         if (o['estado'] != 'suspendido')
           FilledButton.icon(
-            onPressed: () => _accion([() => repo.cambiarEstado(r.objetivoId, 'suspendido'), revisado],
-                'Perfil suspendido.'),
+            onPressed: () =>
+                _accion([() => repo.cambiarEstado(r.objetivoId, 'suspendido'), revisado], 'Perfil suspendido.'),
             icon: const Icon(Icons.block),
             label: const Text('Suspender perfil'),
           ),
@@ -79,14 +83,19 @@ class _ReportesAdminPageState extends State<ReportesAdminPage> {
     } else {
       final autor = o['usuarios'] as Map<String, dynamic>?;
       final bloqueado = autor?['bloqueado'] == true;
-      detalle = Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('Reseña sobre ${(o['profesionales'] as Map?)?['nombre_publico'] ?? '—'}',
-            style: const TextStyle(fontWeight: FontWeight.w600)),
-        const SizedBox(height: 4),
-        FilaEstrellas(estrellas: (o['estrellas'] as num).toInt()),
-        if ((o['comentario'] as String?)?.isNotEmpty ?? false) Text('“${o['comentario']}”'),
-        if (bloqueado) const Text('Autor bloqueado', style: TextStyle(color: Color(0xFFB3261E))),
-      ]);
+      detalle = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Reseña sobre ${(o['profesionales'] as Map?)?['nombre_publico'] ?? '—'}',
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 4),
+          FilaEstrellas(estrellas: (o['estrellas'] as num).toInt()),
+          if ((o['comentario'] as String?)?.isNotEmpty ?? false) Text('“${o['comentario']}”'),
+          if (bloqueado) const Text('Autor bloqueado', style: TextStyle(color: Color(0xFFB3261E))),
+        ],
+      );
       acciones = [
         FilledButton.icon(
           onPressed: () => _accion([() => repo.borrarResena(r.objetivoId), revisado], 'Reseña borrada.'),
@@ -109,28 +118,37 @@ class _ReportesAdminPageState extends State<ReportesAdminPage> {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            Icon(r.tipo == 'perfil' ? Icons.person_outline : Icons.rate_review_outlined),
-            const SizedBox(width: 8),
-            Expanded(child: Text(r.motivo, style: Theme.of(context).textTheme.titleMedium)),
-            Text('${f.day}/${f.month}/${f.year}', style: Theme.of(context).textTheme.bodySmall),
-          ]),
-          const SizedBox(height: 10),
-          detalle,
-          const SizedBox(height: 14),
-          Wrap(spacing: 8, runSpacing: 8, children: [
-            ...acciones,
-            OutlinedButton(
-              onPressed: () => _accion([revisado], 'Marcado como revisado.'),
-              child: const Text('Revisado, sin acción'),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(r.tipo == 'perfil' ? Icons.person_outline : Icons.rate_review_outlined),
+                const SizedBox(width: 8),
+                Expanded(child: Text(r.motivo, style: Theme.of(context).textTheme.titleMedium)),
+                Text('${f.day}/${f.month}/${f.year}', style: Theme.of(context).textTheme.bodySmall),
+              ],
             ),
-            TextButton(
-              onPressed: () => _accion([() => repo.resolverReporte(r.id, 'descartado')], 'Reporte descartado.'),
-              child: const Text('Descartar'),
+            const SizedBox(height: 10),
+            detalle,
+            const SizedBox(height: 14),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                ...acciones,
+                OutlinedButton(
+                  onPressed: () => _accion([revisado], 'Marcado como revisado.'),
+                  child: const Text('Revisado, sin acción'),
+                ),
+                TextButton(
+                  onPressed: () => _accion([() => repo.resolverReporte(r.id, 'descartado')], 'Reporte descartado.'),
+                  child: const Text('Descartar'),
+                ),
+              ],
             ),
-          ]),
-        ]),
+          ],
+        ),
       ),
     );
   }

@@ -18,7 +18,9 @@ insert into public.oficios (nombre, icono, orden) values
   ('Cámaras de seguridad',         'videocam',           11),
   ('Técnico en telecomunicaciones','cell_tower',         12),
   ('Técnico en computadoras',      'computer',           13),
-  ('Taxis',                        'local_taxi',         14)
+  ('Taxis',                        'local_taxi',         14),
+  ('Delivery',                     'delivery_dining',    15),
+  ('Arreglos florales',            'local_florist',      16)
 on conflict (nombre) do nothing;
 
 insert into public.parroquias (nombre, canton) values

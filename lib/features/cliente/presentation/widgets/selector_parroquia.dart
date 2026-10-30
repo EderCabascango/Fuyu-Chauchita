@@ -4,21 +4,17 @@ import '../../data/modelos.dart';
 
 /// Hoja inferior para elegir parroquia. Devuelve el id elegido,
 /// `-1` para "Todas", o `null` si el usuario la cerró sin elegir.
-Future<int?> elegirParroquia(
-  BuildContext context, {
-  required List<Parroquia> parroquias,
-  required int? actual,
-}) {
+Future<int?> elegirParroquia(BuildContext context, {required List<Parroquia> parroquias, required int? actual}) {
   return showModalBottomSheet<int>(
     context: context,
     isScrollControlled: true,
     builder: (context) {
       Widget opcion(int valor, String nombre, bool marcada) => ListTile(
-            leading: Icon(valor == -1 ? Icons.map_outlined : Icons.place_outlined),
-            title: Text(nombre),
-            trailing: marcada ? Icon(Icons.check_rounded, color: Theme.of(context).colorScheme.primary) : null,
-            onTap: () => Navigator.pop(context, valor),
-          );
+        leading: Icon(valor == -1 ? Icons.map_outlined : Icons.place_outlined),
+        title: Text(nombre),
+        trailing: marcada ? Icon(Icons.check_rounded, color: Theme.of(context).colorScheme.primary) : null,
+        onTap: () => Navigator.pop(context, valor),
+      );
 
       return SafeArea(
         child: Column(

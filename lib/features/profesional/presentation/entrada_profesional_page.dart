@@ -32,7 +32,9 @@ class _EntradaProfesionalPageState extends State<EntradaProfesionalPage> {
       Navigator.pop(context);
       return;
     }
-    setState(() => _perfil = _repo.miPerfil());
+    setState(() {
+      _perfil = _repo.miPerfil();
+    });
   }
 
   @override
@@ -50,7 +52,9 @@ class _EntradaProfesionalPageState extends State<EntradaProfesionalPage> {
             appBar: AppBar(),
             body: MensajeError(
               mensaje: mensajeDeError(snapshot.error!),
-              onReintentar: () => setState(() => _perfil = _repo.miPerfil()),
+              onReintentar: () => setState(() {
+                _perfil = _repo.miPerfil();
+              }),
             ),
           );
         }
@@ -58,7 +62,9 @@ class _EntradaProfesionalPageState extends State<EntradaProfesionalPage> {
         if (perfil == null) {
           return EditarPerfilPage(
             repo: _repo,
-            onGuardado: () => setState(() => _perfil = _repo.miPerfil()),
+            onGuardado: () => setState(() {
+              _perfil = _repo.miPerfil();
+            }),
           );
         }
         return MiPerfilPage(repo: _repo, perfilInicial: perfil);

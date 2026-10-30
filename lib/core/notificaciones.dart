@@ -37,10 +37,9 @@ class Notificaciones {
     FirebaseMessaging.onMessage.listen((mensaje) {
       final n = mensaje.notification;
       if (n == null) return;
-      mensajero.currentState?.showSnackBar(SnackBar(
-        content: Text([n.title, n.body].whereType<String>().join('\n')),
-        duration: const Duration(seconds: 6),
-      ));
+      mensajero.currentState?.showSnackBar(
+        SnackBar(content: Text([n.title, n.body].whereType<String>().join('\n')), duration: const Duration(seconds: 6)),
+      );
     });
     FirebaseMessaging.instance.onTokenRefresh.listen(_guardar);
   }

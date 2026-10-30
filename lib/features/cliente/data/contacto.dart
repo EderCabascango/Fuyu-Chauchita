@@ -16,12 +16,7 @@ Uri enlaceLlamada(String whatsapp) => Uri(scheme: 'tel', path: '+$whatsapp');
 
 /// Registra el contacto y abre WhatsApp o el marcador.
 /// Devuelve `false` si el teléfono no pudo abrir la app.
-Future<bool> contactar(
-  ClienteRepositorio repo,
-  Profesional p,
-  CanalContacto canal, {
-  String? oficio,
-}) async {
+Future<bool> contactar(ClienteRepositorio repo, Profesional p, CanalContacto canal, {String? oficio}) async {
   // Se espera el registro antes de abrir WhatsApp: si la app pasa a segundo
   // plano primero, algunos teléfonos (p. ej. Xiaomi) cortan la petición.
   // Máximo 3 s, y si falla igual se deja contactar.
@@ -31,9 +26,7 @@ Future<bool> contactar(
     debugPrint('No se pudo registrar el contacto: $e');
   }
 
-  final uri = canal == CanalContacto.whatsapp
-      ? enlaceWhatsapp(p.whatsapp, oficio: oficio)
-      : enlaceLlamada(p.whatsapp);
+  final uri = canal == CanalContacto.whatsapp ? enlaceWhatsapp(p.whatsapp, oficio: oficio) : enlaceLlamada(p.whatsapp);
   try {
     return await launchUrl(uri, mode: LaunchMode.externalApplication);
   } catch (_) {

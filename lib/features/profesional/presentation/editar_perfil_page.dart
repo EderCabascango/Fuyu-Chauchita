@@ -32,9 +32,7 @@ class _EditarPerfilPageState extends State<EditarPerfilPage> {
   final _form = GlobalKey<FormState>();
   late final _nombre = TextEditingController(text: widget.actual?.nombrePublico);
   late final _whatsapp = TextEditingController(
-    text: widget.actual != null
-        ? '0${widget.actual!.whatsapp.substring(3)}'
-        : _celularDeLaCuenta(),
+    text: widget.actual != null ? '0${widget.actual!.whatsapp.substring(3)}' : _celularDeLaCuenta(),
   );
   late final _descripcion = TextEditingController(text: widget.actual?.descripcion);
   late final _horario = TextEditingController(text: widget.actual?.horario);
@@ -70,18 +68,21 @@ class _EditarPerfilPageState extends State<EditarPerfilPage> {
     final camara = await showModalBottomSheet<bool>(
       context: context,
       builder: (context) => SafeArea(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          ListTile(
-            leading: const Icon(Icons.photo_camera_outlined),
-            title: const Text('Tomar foto'),
-            onTap: () => Navigator.pop(context, true),
-          ),
-          ListTile(
-            leading: const Icon(Icons.photo_library_outlined),
-            title: const Text('Elegir de la galería'),
-            onTap: () => Navigator.pop(context, false),
-          ),
-        ]),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_camera_outlined),
+              title: const Text('Tomar foto'),
+              onTap: () => Navigator.pop(context, true),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined),
+              title: const Text('Elegir de la galería'),
+              onTap: () => Navigator.pop(context, false),
+            ),
+          ],
+        ),
       ),
     );
     if (camara == null) return;
@@ -91,11 +92,13 @@ class _EditarPerfilPageState extends State<EditarPerfilPage> {
 
   Future<void> _guardar() async {
     final valido = _form.currentState!.validate();
-    setState(() => _errorListas = _oficios.isEmpty
-        ? 'Elige al menos un oficio.'
-        : _parroquias.isEmpty
-            ? 'Elige al menos una parroquia.'
-            : null);
+    setState(
+      () => _errorListas = _oficios.isEmpty
+          ? 'Elige al menos un oficio.'
+          : _parroquias.isEmpty
+          ? 'Elige al menos una parroquia.'
+          : null,
+    );
     if (!valido || _errorListas != null) return;
 
     final datos = DatosPerfil(
@@ -155,11 +158,9 @@ class _EditarPerfilPageState extends State<EditarPerfilPage> {
                       style: texto.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.outline),
                     ),
                   ),
-                Center(child: _SelectorFoto(
-                  bytes: _fotoNueva,
-                  url: widget.actual?.fotoUrl,
-                  onTap: _elegirFoto,
-                )),
+                Center(
+                  child: _SelectorFoto(bytes: _fotoNueva, url: widget.actual?.fotoUrl, onTap: _elegirFoto),
+                ),
                 const SizedBox(height: 20),
                 TextFormField(
                   controller: _nombre,
@@ -206,34 +207,42 @@ class _EditarPerfilPageState extends State<EditarPerfilPage> {
                 const SizedBox(height: 22),
                 Text('¿Qué oficios haces? *', style: texto.titleMedium),
                 const SizedBox(height: 8),
-                Wrap(spacing: 8, runSpacing: 8, children: [
-                  for (final o in oficios)
-                    FilterChip(
-                      label: Text(o.nombre),
-                      selected: _oficios.contains(o.id),
-                      onSelected: (s) => setState(() => s ? _oficios.add(o.id) : _oficios.remove(o.id)),
-                    ),
-                ]),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final o in oficios)
+                      FilterChip(
+                        label: Text(o.nombre),
+                        selected: _oficios.contains(o.id),
+                        onSelected: (s) => setState(() => s ? _oficios.add(o.id) : _oficios.remove(o.id)),
+                      ),
+                  ],
+                ),
                 const SizedBox(height: 22),
                 Text('¿En qué parroquias trabajas? *', style: texto.titleMedium),
                 const SizedBox(height: 8),
-                Wrap(spacing: 8, runSpacing: 8, children: [
-                  FilterChip(
-                    avatar: const Icon(Icons.map_outlined, size: 18),
-                    label: const Text('Todo el cantón'),
-                    selected: todoElCanton(_parroquias, parroquias),
-                    onSelected: (s) => setState(() {
-                      _parroquias.clear();
-                      if (s) _parroquias.addAll(parroquias.map((p) => p.id));
-                    }),
-                  ),
-                  for (final p in parroquias)
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
                     FilterChip(
-                      label: Text(p.nombre),
-                      selected: _parroquias.contains(p.id),
-                      onSelected: (s) => setState(() => s ? _parroquias.add(p.id) : _parroquias.remove(p.id)),
+                      avatar: const Icon(Icons.map_outlined, size: 18),
+                      label: const Text('Todo el cantón'),
+                      selected: todoElCanton(_parroquias, parroquias),
+                      onSelected: (s) => setState(() {
+                        _parroquias.clear();
+                        if (s) _parroquias.addAll(parroquias.map((p) => p.id));
+                      }),
                     ),
-                ]),
+                    for (final p in parroquias)
+                      FilterChip(
+                        label: Text(p.nombre),
+                        selected: _parroquias.contains(p.id),
+                        onSelected: (s) => setState(() => s ? _parroquias.add(p.id) : _parroquias.remove(p.id)),
+                      ),
+                  ],
+                ),
                 if (_errorListas != null) ...[
                   const SizedBox(height: 12),
                   Text(_errorListas!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
@@ -273,17 +282,21 @@ class _SelectorFoto extends StatelessWidget {
 
     return GestureDetector(
       onTap: onTap,
-      child: Column(children: [
-        CircleAvatar(
-          radius: 52,
-          backgroundColor: esquema.primaryContainer,
-          backgroundImage: imagen,
-          child: imagen == null ? Icon(Icons.add_a_photo_outlined, size: 34, color: esquema.primary) : null,
-        ),
-        const SizedBox(height: 6),
-        Text(imagen == null ? 'Agregar tu foto' : 'Cambiar foto',
-            style: TextStyle(color: esquema.primary, fontWeight: FontWeight.w600)),
-      ]),
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 52,
+            backgroundColor: esquema.primaryContainer,
+            backgroundImage: imagen,
+            child: imagen == null ? Icon(Icons.add_a_photo_outlined, size: 34, color: esquema.primary) : null,
+          ),
+          const SizedBox(height: 6),
+          Text(
+            imagen == null ? 'Agregar tu foto' : 'Cambiar foto',
+            style: TextStyle(color: esquema.primary, fontWeight: FontWeight.w600),
+          ),
+        ],
+      ),
     );
   }
 }

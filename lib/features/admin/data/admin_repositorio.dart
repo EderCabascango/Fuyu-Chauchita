@@ -16,11 +16,11 @@ class ProfesionalAdmin {
   final DateTime creadoEn;
 
   factory ProfesionalAdmin.fromMap(Map<String, dynamic> m) => ProfesionalAdmin(
-        Profesional.fromMap(m),
-        cuenta: _cuenta(m['usuarios'] as Map<String, dynamic>?),
-        plan: m['plan'] as String? ?? 'gratis',
-        creadoEn: DateTime.parse(m['creado_en'] as String),
-      );
+    Profesional.fromMap(m),
+    cuenta: _cuenta(m['usuarios'] as Map<String, dynamic>?),
+    plan: m['plan'] as String? ?? 'gratis',
+    creadoEn: DateTime.parse(m['creado_en'] as String),
+  );
 
   static String? _cuenta(Map<String, dynamic>? u) {
     final correo = u?['correo'] as String?;
@@ -71,11 +71,14 @@ class AdminRepositorio {
   // ---------------- Profesionales ----------------
 
   Future<List<ProfesionalAdmin>> profesionales({String? estado}) async {
-    var q = _db.from('profesionales').select(
-        'id, nombre_publico, foto_url, descripcion, whatsapp, horario, disponible_ahora, '
-        'verificado, promedio_estrellas, total_resenas, estado, plan, creado_en, '
-        'usuarios(telefono, correo), oficios(id, nombre, icono), parroquias(id, nombre), '
-        'fotos_trabajo(id, url, orden)');
+    var q = _db
+        .from('profesionales')
+        .select(
+          'id, nombre_publico, foto_url, descripcion, whatsapp, horario, disponible_ahora, '
+          'verificado, promedio_estrellas, total_resenas, estado, plan, creado_en, '
+          'usuarios(telefono, correo), oficios(id, nombre, icono), parroquias(id, nombre), '
+          'fotos_trabajo(id, url, orden)',
+        );
     if (estado != null) q = q.eq('estado', estado);
     final filas = await q.order('creado_en', ascending: estado == 'pendiente');
     return filas.map(ProfesionalAdmin.fromMap).toList();
@@ -87,8 +90,7 @@ class AdminRepositorio {
   Future<void> cambiarVerificado(String id, bool verificado) =>
       _db.from('profesionales').update({'verificado': verificado}).eq('id', id);
 
-  Future<void> cambiarPlan(String id, String plan) =>
-      _db.from('profesionales').update({'plan': plan}).eq('id', id);
+  Future<void> cambiarPlan(String id, String plan) => _db.from('profesionales').update({'plan': plan}).eq('id', id);
 
   // ---------------- Reportes ----------------
 
@@ -99,24 +101,31 @@ class AdminRepositorio {
         .eq('estado', estado)
         .order('creado_en');
 
-    final idsPerfil = [for (final f in filas) if (f['tipo'] == 'perfil') f['objetivo_id'] as String];
-    final idsResena = [for (final f in filas) if (f['tipo'] == 'resena') f['objetivo_id'] as String];
+    final idsPerfil = [
+      for (final f in filas)
+        if (f['tipo'] == 'perfil') f['objetivo_id'] as String,
+    ];
+    final idsResena = [
+      for (final f in filas)
+        if (f['tipo'] == 'resena') f['objetivo_id'] as String,
+    ];
 
     final perfiles = idsPerfil.isEmpty
         ? <Map<String, dynamic>>[]
-        : await _db
-            .from('profesionales')
-            .select('id, nombre_publico, estado, whatsapp')
-            .inFilter('id', idsPerfil);
+        : await _db.from('profesionales').select('id, nombre_publico, estado, whatsapp').inFilter('id', idsPerfil);
     final resenas = idsResena.isEmpty
         ? <Map<String, dynamic>>[]
         : await _db
-            .from('resenas')
-            .select('id, estrellas, comentario, cliente_id, profesionales(nombre_publico), '
-                'usuarios(telefono, bloqueado)')
-            .inFilter('id', idsResena);
+              .from('resenas')
+              .select(
+                'id, estrellas, comentario, cliente_id, profesionales(nombre_publico), '
+                'usuarios(telefono, bloqueado)',
+              )
+              .inFilter('id', idsResena);
 
-    final porId = {for (final o in [...perfiles, ...resenas]) o['id'] as String: o};
+    final porId = {
+      for (final o in [...perfiles, ...resenas]) o['id'] as String: o,
+    };
     return [
       for (final f in filas)
         Reporte(

@@ -31,7 +31,9 @@ class _AdminAppState extends State<AdminApp> {
     _sub = supabase.auth.onAuthStateChange.listen((_) => _revisar());
   }
 
-  void _revisar() => setState(() => _esAdmin = haySesion ? _repo.esAdmin() : Future.value(false));
+  void _revisar() => setState(() {
+    _esAdmin = haySesion ? _repo.esAdmin() : Future.value(false);
+  });
 
   @override
   void dispose() {
@@ -51,13 +53,16 @@ class _AdminAppState extends State<AdminApp> {
         if (s.data != true) {
           return Scaffold(
             body: Center(
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
-                const Icon(Icons.lock_outline, size: 48),
-                const SizedBox(height: 12),
-                const Text('Esta cuenta no es administradora.'),
-                const SizedBox(height: 12),
-                FilledButton(onPressed: _repo.salir, child: const Text('Salir')),
-              ]),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.lock_outline, size: 48),
+                  const SizedBox(height: 12),
+                  const Text('Esta cuenta no es administradora.'),
+                  const SizedBox(height: 12),
+                  FilledButton(onPressed: _repo.salir, child: const Text('Salir')),
+                ],
+              ),
             ),
           );
         }
@@ -89,7 +94,9 @@ class _LoginAdminState extends State<_LoginAdmin> {
     try {
       await widget.repo.ingresar(_correo.text, _clave.text);
     } catch (e) {
-      setState(() => _error = e is AuthException ? 'Correo o contraseña incorrectos.' : mensajeDeError(e));
+      setState(() {
+        _error = e is AuthException ? 'Correo o contraseña incorrectos.' : mensajeDeError(e);
+      });
     } finally {
       if (mounted) setState(() => _ocupado = false);
     }
@@ -105,31 +112,37 @@ class _LoginAdminState extends State<_LoginAdmin> {
             child: Padding(
               padding: const EdgeInsets.all(28),
               child: AutofillGroup(
-                child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                  Text('Oficios Cayambe', style: Theme.of(context).textTheme.labelLarge),
-                  Text('Panel de administración',
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800)),
-                  const SizedBox(height: 24),
-                  TextField(
-                    controller: _correo,
-                    autofillHints: const [AutofillHints.email],
-                    decoration: const InputDecoration(labelText: 'Correo', border: OutlineInputBorder()),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _clave,
-                    obscureText: true,
-                    autofillHints: const [AutofillHints.password],
-                    decoration: const InputDecoration(labelText: 'Contraseña', border: OutlineInputBorder()),
-                    onSubmitted: (_) => _entrar(),
-                  ),
-                  if (_error != null) ...[
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text('Oficios Cayambe', style: Theme.of(context).textTheme.labelLarge),
+                    Text(
+                      'Panel de administración',
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+                    ),
+                    const SizedBox(height: 24),
+                    TextField(
+                      controller: _correo,
+                      autofillHints: const [AutofillHints.email],
+                      decoration: const InputDecoration(labelText: 'Correo', border: OutlineInputBorder()),
+                    ),
                     const SizedBox(height: 12),
-                    Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                    TextField(
+                      controller: _clave,
+                      obscureText: true,
+                      autofillHints: const [AutofillHints.password],
+                      decoration: const InputDecoration(labelText: 'Contraseña', border: OutlineInputBorder()),
+                      onSubmitted: (_) => _entrar(),
+                    ),
+                    if (_error != null) ...[
+                      const SizedBox(height: 12),
+                      Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                    ],
+                    const SizedBox(height: 20),
+                    FilledButton(onPressed: _ocupado ? null : _entrar, child: const Text('Entrar')),
                   ],
-                  const SizedBox(height: 20),
-                  FilledButton(onPressed: _ocupado ? null : _entrar, child: const Text('Entrar')),
-                ]),
+                ),
               ),
             ),
           ),
@@ -173,26 +186,22 @@ class _PanelState extends State<_Panel> {
       appBar: AppBar(
         title: Text(_destinos[_seccion].$2),
         actions: [
-          TextButton.icon(
-            onPressed: widget.repo.salir,
-            icon: const Icon(Icons.logout),
-            label: const Text('Salir'),
-          ),
+          TextButton.icon(onPressed: widget.repo.salir, icon: const Icon(Icons.logout), label: const Text('Salir')),
           const SizedBox(width: 8),
         ],
       ),
-      body: Row(children: [
-        if (ancho)
-          NavigationRail(
-            selectedIndex: _seccion,
-            labelType: NavigationRailLabelType.all,
-            onDestinationSelected: (i) => setState(() => _seccion = i),
-            destinations: [
-              for (final d in _destinos) NavigationRailDestination(icon: Icon(d.$1), label: Text(d.$2)),
-            ],
-          ),
-        Expanded(child: pagina),
-      ]),
+      body: Row(
+        children: [
+          if (ancho)
+            NavigationRail(
+              selectedIndex: _seccion,
+              labelType: NavigationRailLabelType.all,
+              onDestinationSelected: (i) => setState(() => _seccion = i),
+              destinations: [for (final d in _destinos) NavigationRailDestination(icon: Icon(d.$1), label: Text(d.$2))],
+            ),
+          Expanded(child: pagina),
+        ],
+      ),
       bottomNavigationBar: ancho
           ? null
           : NavigationBar(

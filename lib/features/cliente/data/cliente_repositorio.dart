@@ -28,8 +28,7 @@ class ClienteRepositorio {
   /// Profesionales aprobados de un oficio, opcionalmente en una parroquia.
   /// Orden: disponibles ahora primero, luego mejor calificados.
   Future<List<Profesional>> buscar({required int oficioId, int? parroquiaId}) async {
-    final filtros = StringBuffer(_camposResumen)
-      ..write(', f_oficio:profesional_oficio!inner(oficio_id)');
+    final filtros = StringBuffer(_camposResumen)..write(', f_oficio:profesional_oficio!inner(oficio_id)');
     if (parroquiaId != null) {
       filtros.write(', f_parroquia:profesional_parroquia!inner(parroquia_id)');
     }
@@ -51,13 +50,38 @@ class ClienteRepositorio {
     return filas.map(Profesional.fromMap).toList();
   }
 
+  /// Busca profesionales aprobados por nombre o descripción.
+  Future<List<Profesional>> buscarTexto(String texto) async {
+    final termino = limpiarBusqueda(texto);
+    if (termino.length < 2) return [];
+    final filas = await _db
+        .from('profesionales')
+        .select(_camposResumen)
+        .eq('estado', 'aprobado')
+        .or('nombre_publico.ilike.*$termino*,descripcion.ilike.*$termino*')
+        .order('disponible_ahora', ascending: false)
+        .order('promedio_estrellas', ascending: false)
+        .limit(30);
+    return filas.map(Profesional.fromMap).toList();
+  }
+
+  /// Profesionales aprobados con estos ids (para favoritos), en el mismo orden.
+  Future<List<Profesional>> porIds(List<String> ids) async {
+    if (ids.isEmpty) return [];
+    final filas = await _db.from('profesionales').select(_camposResumen).eq('estado', 'aprobado').inFilter('id', ids);
+    final porId = {for (final f in filas) f['id'] as String: Profesional.fromMap(f)};
+    return [for (final id in ids) ?porId[id]];
+  }
+
   /// Perfil completo, con fotos y reseñas. `null` si no existe o no está aprobado.
   Future<Profesional?> perfil(String id) async {
     final fila = await _db
         .from('profesionales')
-        .select('$_camposResumen, '
-            'fotos_trabajo(id, url, orden), '
-            'resenas(id, estrellas, comentario, creado_en, cliente_id)')
+        .select(
+          '$_camposResumen, '
+          'fotos_trabajo(id, url, orden), '
+          'resenas(id, estrellas, comentario, creado_en, cliente_id)',
+        )
         .eq('id', id)
         .eq('estado', 'aprobado')
         .maybeSingle();
@@ -80,15 +104,12 @@ class ClienteRepositorio {
   /// Crea o actualiza mi reseña (una por profesional).
   Future<void> guardarResena(String profesionalId, int estrellas, String? comentario) {
     final texto = comentario?.trim();
-    return _db.from('resenas').upsert(
-      {
-        'profesional_id': profesionalId,
-        'cliente_id': _db.auth.currentUser!.id,
-        'estrellas': estrellas,
-        'comentario': (texto == null || texto.isEmpty) ? null : texto,
-      },
-      onConflict: 'profesional_id,cliente_id',
-    );
+    return _db.from('resenas').upsert({
+      'profesional_id': profesionalId,
+      'cliente_id': _db.auth.currentUser!.id,
+      'estrellas': estrellas,
+      'comentario': (texto == null || texto.isEmpty) ? null : texto,
+    }, onConflict: 'profesional_id,cliente_id');
   }
 
   Future<void> borrarResena(String resenaId) => _db.from('resenas').delete().eq('id', resenaId);
@@ -109,3 +130,29 @@ class ClienteRepositorio {
 enum CanalContacto { whatsapp, llamada }
 
 enum TipoReporte { perfil, resena }
+
+/// Deja solo letras, números y espacios (máx. 40). Evita que el texto escrito
+/// altere la consulta (comas, paréntesis, comodines…).
+String limpiarBusqueda(String texto) {
+  final limpio = texto.replaceAll(RegExp(r'[^\p{L}\p{N} ]', unicode: true), ' ').replaceAll(RegExp(r'\s+'), ' ').trim();
+  return limpio.length > 40 ? limpio.substring(0, 40).trim() : limpio;
+}
+
+/// Para comparar sin tildes ni mayúsculas: "Técnico" == "tecnico".
+String sinTildes(String texto) {
+  const de = 'áéíóúüñÁÉÍÓÚÜÑ';
+  const a = 'aeiouunAEIOUUN';
+  final b = StringBuffer();
+  for (final c in texto.split('')) {
+    final i = de.indexOf(c);
+    b.write(i >= 0 ? a[i] : c);
+  }
+  return b.toString().toLowerCase();
+}
+
+/// Oficios cuyo nombre contiene el texto (sin importar tildes).
+List<Oficio> filtrarOficios(List<Oficio> oficios, String texto) {
+  final t = sinTildes(texto.trim());
+  if (t.isEmpty) return oficios;
+  return oficios.where((o) => sinTildes(o.nombre).contains(t)).toList();
+}

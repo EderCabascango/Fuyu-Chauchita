@@ -3,16 +3,12 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../data/modelos.dart';
 import 'avatar_profesional.dart';
+import 'boton_favorito.dart';
 import 'estrellas.dart';
 import 'insignias.dart';
 
 class TarjetaProfesional extends StatelessWidget {
-  const TarjetaProfesional({
-    super.key,
-    required this.profesional,
-    required this.onTap,
-    required this.onWhatsapp,
-  });
+  const TarjetaProfesional({super.key, required this.profesional, required this.onTap, required this.onWhatsapp});
 
   final Profesional profesional;
   final VoidCallback onTap;
@@ -36,14 +32,29 @@ class TarjetaProfesional extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Flexible(
-                      child: Text(
-                        p.nombrePublico,
-                        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppTheme.tinta),
-                        overflow: TextOverflow.ellipsis,
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              p.nombrePublico,
+                              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppTheme.tinta),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (p.verificado) ...[const SizedBox(width: 4), const IconoVerificado()],
+                        ],
                       ),
                     ),
-                    if (p.verificado) ...[const SizedBox(width: 4), const IconoVerificado()],
+                    SizedBox(
+                      width: 32,
+                      height: 28,
+                      child: OverflowBox(
+                        maxWidth: 48,
+                        maxHeight: 48,
+                        child: BotonFavorito(profesionalId: p.id, tamano: 22),
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 4),
@@ -55,9 +66,11 @@ class TarjetaProfesional extends StatelessWidget {
                       const Icon(Icons.place_outlined, size: 15, color: AppTheme.gris),
                       const SizedBox(width: 2),
                       Expanded(
-                        child: Text(zonas,
-                            style: const TextStyle(fontSize: 12.5, color: AppTheme.gris),
-                            overflow: TextOverflow.ellipsis),
+                        child: Text(
+                          zonas,
+                          style: const TextStyle(fontSize: 12.5, color: AppTheme.gris),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ],
                   ),

@@ -22,8 +22,10 @@ class Calificacion extends StatelessWidget {
         Icon(Icons.star_rounded, size: grande ? 22 : 18, color: AppTheme.ambar),
         const SizedBox(width: 2),
         Text(promedio.toStringAsFixed(1), style: estilo.copyWith(fontWeight: FontWeight.w700)),
-        Text(' ($total ${total == 1 ? 'reseña' : 'reseñas'})',
-            style: estilo.copyWith(color: Theme.of(context).colorScheme.outline)),
+        Text(
+          ' ($total ${total == 1 ? 'reseña' : 'reseñas'})',
+          style: estilo.copyWith(color: Theme.of(context).colorScheme.outline),
+        ),
       ],
     );
   }
@@ -42,11 +44,7 @@ class FilaEstrellas extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         for (var i = 1; i <= 5; i++)
-          Icon(
-            i <= estrellas ? Icons.star_rounded : Icons.star_outline_rounded,
-            size: tamano,
-            color: AppTheme.ambar,
-          ),
+          Icon(i <= estrellas ? Icons.star_rounded : Icons.star_outline_rounded, size: tamano, color: AppTheme.ambar),
       ],
     );
   }

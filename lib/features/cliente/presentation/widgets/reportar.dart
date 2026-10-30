@@ -39,9 +39,9 @@ Future<void> reportar(
   try {
     await repo.reportar(tipo: tipo, objetivoId: objetivoId, motivo: motivo);
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Gracias. Revisaremos tu reporte pronto.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Gracias. Revisaremos tu reporte pronto.')));
     }
   } catch (e) {
     if (context.mounted) {
@@ -80,24 +80,26 @@ class _HojaReporteState extends State<_HojaReporte> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(widget.tipo == TipoReporte.perfil ? 'Reportar perfil' : 'Reportar reseña',
-                  style: Theme.of(context).textTheme.titleLarge),
+              Text(
+                widget.tipo == TipoReporte.perfil ? 'Reportar perfil' : 'Reportar reseña',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
               const SizedBox(height: 8),
               RadioGroup<String>(
                 groupValue: _motivo,
                 onChanged: (v) => setState(() => _motivo = v),
-                child: Column(children: [
-                  for (final m in motivos)
-                    RadioListTile<String>(value: m, title: Text(m), contentPadding: EdgeInsets.zero),
-                ]),
+                child: Column(
+                  children: [
+                    for (final m in motivos)
+                      RadioListTile<String>(value: m, title: Text(m), contentPadding: EdgeInsets.zero),
+                  ],
+                ),
               ),
               TextField(
                 controller: _detalle,
                 maxLines: 3,
                 maxLength: 300,
-                decoration: const InputDecoration(
-                  labelText: 'Cuéntanos más (opcional)',
-                ),
+                decoration: const InputDecoration(labelText: 'Cuéntanos más (opcional)'),
               ),
               const SizedBox(height: 8),
               FilledButton(

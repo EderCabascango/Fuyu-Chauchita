@@ -15,11 +15,11 @@ class GoogleSinConfigurar implements Exception {}
 Future<GoogleSignIn>? _google;
 
 Future<GoogleSignIn> _iniciarGoogle() => _google ??= () async {
-      final id = Env.googleWebClientId;
-      if (id == null) throw GoogleSinConfigurar();
-      await GoogleSignIn.instance.initialize(serverClientId: id);
-      return GoogleSignIn.instance;
-    }();
+  final id = Env.googleWebClientId;
+  if (id == null) throw GoogleSinConfigurar();
+  await GoogleSignIn.instance.initialize(serverClientId: id);
+  return GoogleSignIn.instance;
+}();
 
 /// Abre el selector de cuentas de Google y crea la sesión en Supabase.
 /// Devuelve `false` si el usuario cerró el selector sin elegir.
@@ -62,10 +62,7 @@ Future<void> salirDeGoogle() async {
 /// Si no hay sesión, abre el login. Devuelve `true` si al final hay sesión.
 Future<bool> exigirSesion(BuildContext context, {required String motivo}) async {
   if (haySesion) return true;
-  final ok = await Navigator.push<bool>(
-    context,
-    MaterialPageRoute(builder: (_) => LoginPage(motivo: motivo)),
-  );
+  final ok = await Navigator.push<bool>(context, MaterialPageRoute(builder: (_) => LoginPage(motivo: motivo)));
   return ok == true && haySesion;
 }
 
@@ -102,7 +99,8 @@ String mensajeDeError(Object e) {
     if (texto.contains('expired') || texto.contains('token') || texto.contains('otp')) {
       return 'El código no es correcto o ya venció. Pide uno nuevo.';
     }
-    if (texto.contains('signups not allowed') || texto.contains('email logins are disabled') ||
+    if (texto.contains('signups not allowed') ||
+        texto.contains('email logins are disabled') ||
         texto.contains('email provider')) {
       return 'El ingreso por correo todavía no está configurado.';
     }

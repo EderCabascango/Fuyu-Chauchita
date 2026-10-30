@@ -57,8 +57,10 @@ class _ResenaPageState extends State<ResenaPage> {
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
-          Text('¿Cómo fue tu experiencia con ${widget.profesional.nombrePublico}?',
-              style: texto.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
+          Text(
+            '¿Cómo fue tu experiencia con ${widget.profesional.nombrePublico}?',
+            style: texto.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+          ),
           const SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -68,10 +70,7 @@ class _ResenaPageState extends State<ResenaPage> {
                   iconSize: 44,
                   tooltip: '$i ${i == 1 ? 'estrella' : 'estrellas'}',
                   onPressed: () => setState(() => _estrellas = i),
-                  icon: Icon(
-                    i <= _estrellas ? Icons.star_rounded : Icons.star_outline_rounded,
-                    color: AppTheme.ambar,
-                  ),
+                  icon: Icon(i <= _estrellas ? Icons.star_rounded : Icons.star_outline_rounded, color: AppTheme.ambar),
                 ),
             ],
           ),
@@ -89,16 +88,18 @@ class _ResenaPageState extends State<ResenaPage> {
             ),
           ),
           const SizedBox(height: 8),
-          Text('Tu reseña es pública, pero no se muestra tu nombre ni tu número.',
-              style: texto.bodySmall?.copyWith(color: Theme.of(context).colorScheme.outline)),
+          Text(
+            'Tu reseña es pública, pero no se muestra tu nombre ni tu número.',
+            style: texto.bodySmall?.copyWith(color: Theme.of(context).colorScheme.outline),
+          ),
           const SizedBox(height: 24),
           FilledButton(
             onPressed: _ocupado || _estrellas == 0
                 ? null
                 : () => _ejecutar(
-                      () => widget.repo.guardarResena(widget.profesional.id, _estrellas, _comentario.text),
-                      '¡Gracias por tu reseña!',
-                    ),
+                    () => widget.repo.guardarResena(widget.profesional.id, _estrellas, _comentario.text),
+                    '¡Gracias por tu reseña!',
+                  ),
             child: const Text('Publicar reseña'),
           ),
           if (widget.actual != null) ...[

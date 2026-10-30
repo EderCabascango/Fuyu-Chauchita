@@ -50,8 +50,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _google() => _ejecutar(() async {
-        if (await ingresarConGoogle() && mounted) Navigator.pop(context, true);
-      });
+    if (await ingresarConGoogle() && mounted) Navigator.pop(context, true);
+  });
 
   void _enviarCodigo() {
     final correo = normalizarCorreo(_correoEnviado ?? _correoCtrl.text);
@@ -101,20 +101,27 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             Container(
               padding: const EdgeInsets.all(22),
-              decoration: BoxDecoration(color: AppTheme.azul, borderRadius: BorderRadius.circular(26)),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(color: const Color(0x1FFFFFFF), borderRadius: BorderRadius.circular(14)),
-                  child: const Icon(Icons.lock_open_rounded, color: AppTheme.naranja),
-                ),
-                const SizedBox(height: 14),
-                Text(widget.motivo,
-                    style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
-                const SizedBox(height: 6),
-                const Text('Sin contraseñas. Entra con Google o con un código que te enviamos al correo.',
-                    style: TextStyle(color: Colors.white70, height: 1.35)),
-              ]),
+              decoration: BoxDecoration(gradient: AppTheme.degradado, borderRadius: BorderRadius.circular(26)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(color: const Color(0x1FFFFFFF), borderRadius: BorderRadius.circular(14)),
+                    child: const Icon(Icons.lock_open_rounded, color: AppTheme.acento),
+                  ),
+                  const SizedBox(height: 14),
+                  Text(
+                    widget.motivo,
+                    style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Sin contraseñas. Entra con Google o con un código que te enviamos al correo.',
+                    style: TextStyle(color: Colors.white70, height: 1.35),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 24),
             if (!enviado) ...[
@@ -130,14 +137,19 @@ class _LoginPageState extends State<LoginPage> {
                 label: const Text('Continuar con Google'),
               ),
               const SizedBox(height: 22),
-              const Row(children: [
-                Expanded(child: Divider()),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12),
-                  child: Text('o con tu correo', style: TextStyle(color: AppTheme.gris, fontWeight: FontWeight.w600)),
-                ),
-                Expanded(child: Divider()),
-              ]),
+              const Row(
+                children: [
+                  Expanded(child: Divider()),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: Text(
+                      'o con tu correo',
+                      style: TextStyle(color: AppTheme.gris, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  Expanded(child: Divider()),
+                ],
+              ),
               const SizedBox(height: 18),
               TextField(
                 controller: _correoCtrl,
@@ -156,17 +168,24 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 14),
               FilledButton(
                 onPressed: _ocupado ? null : _enviarCodigo,
-                style: FilledButton.styleFrom(backgroundColor: AppTheme.naranja),
+                style: AppTheme.botonAcento,
                 child: _ocupado ? const _Cargando() : const Text('Enviarme un código'),
               ),
             ] else ...[
               Text('Revisa tu correo', style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 6),
-              Text.rich(TextSpan(children: [
-                const TextSpan(text: 'Enviamos un código a '),
-                TextSpan(text: _correoEnviado, style: const TextStyle(fontWeight: FontWeight.w800)),
-                const TextSpan(text: '. Si no aparece, mira en la carpeta de spam o promociones.'),
-              ])),
+              Text.rich(
+                TextSpan(
+                  children: [
+                    const TextSpan(text: 'Enviamos un código a '),
+                    TextSpan(
+                      text: _correoEnviado,
+                      style: const TextStyle(fontWeight: FontWeight.w800),
+                    ),
+                    const TextSpan(text: '. Si no aparece, mira en la carpeta de spam o promociones.'),
+                  ],
+                ),
+              ),
               const SizedBox(height: 18),
               TextField(
                 controller: _codigoCtrl,
@@ -194,10 +213,10 @@ class _LoginPageState extends State<LoginPage> {
                 onPressed: _ocupado
                     ? null
                     : () => setState(() {
-                          _correoEnviado = null;
-                          _codigoCtrl.clear();
-                          _error = null;
-                        }),
+                        _correoEnviado = null;
+                        _codigoCtrl.clear();
+                        _error = null;
+                      }),
                 child: const Text('Usar otro correo'),
               ),
             ],
@@ -226,11 +245,8 @@ class _Cargando extends StatelessWidget {
   const _Cargando();
 
   @override
-  Widget build(BuildContext context) => const SizedBox(
-        width: 22,
-        height: 22,
-        child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
-      );
+  Widget build(BuildContext context) =>
+      const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white));
 }
 
 class _LetraG extends StatelessWidget {
@@ -238,7 +254,7 @@ class _LetraG extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const Text(
-        'G',
-        style: TextStyle(color: Color(0xFF4285F4), fontWeight: FontWeight.w900, fontSize: 20),
-      );
+    'G',
+    style: TextStyle(color: Color(0xFF4285F4), fontWeight: FontWeight.w900, fontSize: 20),
+  );
 }

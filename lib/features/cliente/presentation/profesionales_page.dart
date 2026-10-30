@@ -35,8 +35,7 @@ class _ProfesionalesPageState extends State<ProfesionalesPage> {
   late int? _parroquiaId = widget.parroquiaInicial;
   late Future<List<Profesional>> _lista = _buscar();
 
-  Future<List<Profesional>> _buscar() =>
-      widget.repo.buscar(oficioId: widget.oficio.id, parroquiaId: _parroquiaId);
+  Future<List<Profesional>> _buscar() => widget.repo.buscar(oficioId: widget.oficio.id, parroquiaId: _parroquiaId);
 
   void _filtrar(int? id) {
     if (id == _parroquiaId) return;
@@ -51,9 +50,9 @@ class _ProfesionalesPageState extends State<ProfesionalesPage> {
   Future<void> _whatsapp(Profesional p) async {
     final ok = await contactar(widget.repo, p, CanalContacto.whatsapp, oficio: widget.oficio.nombre);
     if (!ok && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No se pudo abrir WhatsApp. ¿Está instalado?')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('No se pudo abrir WhatsApp. ¿Está instalado?')));
     }
   }
 
@@ -72,11 +71,7 @@ class _ProfesionalesPageState extends State<ProfesionalesPage> {
       appBar: AppBar(title: Text(widget.oficio.nombre)),
       body: Column(
         children: [
-          _FiltroParroquias(
-            parroquias: widget.parroquias,
-            seleccionada: _parroquiaId,
-            onCambio: _filtrar,
-          ),
+          _FiltroParroquias(parroquias: widget.parroquias, seleccionada: _parroquiaId, onCambio: _filtrar),
           Expanded(
             child: FutureBuilder(
               future: _lista,
@@ -87,7 +82,9 @@ class _ProfesionalesPageState extends State<ProfesionalesPage> {
                 if (snapshot.hasError) {
                   return MensajeError(
                     mensaje: 'No pudimos cargar la lista.\nRevisa tu conexión a internet.',
-                    onReintentar: () => setState(() => _lista = _buscar()),
+                    onReintentar: () => setState(() {
+                      _lista = _buscar();
+                    }),
                   );
                 }
                 final lista = snapshot.data!;
@@ -135,24 +132,21 @@ class _FiltroParroquias extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget chip(int? id, String nombre) => Padding(
-          padding: const EdgeInsets.only(right: 8),
-          child: ChoiceChip(
-            label: Text(nombre),
-            selected: seleccionada == id,
-            showCheckmark: false,
-            onSelected: (_) => onCambio(id),
-          ),
-        );
+      padding: const EdgeInsets.only(right: 8),
+      child: ChoiceChip(
+        label: Text(nombre),
+        selected: seleccionada == id,
+        showCheckmark: false,
+        onSelected: (_) => onCambio(id),
+      ),
+    );
 
     return SizedBox(
       height: 58,
       child: ListView(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
-        children: [
-          chip(null, 'Todo el cantón'),
-          for (final p in parroquias) chip(p.id, p.nombre),
-        ],
+        children: [chip(null, 'Todo el cantón'), for (final p in parroquias) chip(p.id, p.nombre)],
       ),
     );
   }
@@ -187,7 +181,9 @@ class _SinResultados extends StatelessWidget {
         ),
         if (hayFiltro) ...[
           const SizedBox(height: 16),
-          Center(child: TextButton(onPressed: onVerTodas, child: const Text('Ver todo el cantón'))),
+          Center(
+            child: TextButton(onPressed: onVerTodas, child: const Text('Ver todo el cantón')),
+          ),
         ],
       ],
     );
@@ -204,23 +200,32 @@ class _Resumen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(color: AppTheme.azul, borderRadius: BorderRadius.circular(AppTheme.radio)),
-      child: Row(children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: const Color(0x1FFFFFFF), borderRadius: BorderRadius.circular(16)),
-          child: Icon(iconoOficio(oficio.icono), color: AppTheme.naranja, size: 28),
-        ),
-        const SizedBox(width: 14),
-        Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('$total ${total == 1 ? 'profesional' : 'profesionales'}',
-                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
-            const Text('Toca el botón verde para escribir por WhatsApp.',
-                style: TextStyle(color: Colors.white70, fontSize: 13)),
-          ]),
-        ),
-      ]),
+      decoration: BoxDecoration(gradient: AppTheme.degradado, borderRadius: BorderRadius.circular(AppTheme.radio)),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: const Color(0x1FFFFFFF), borderRadius: BorderRadius.circular(16)),
+            child: IconoOficio(clave: oficio.icono, color: AppTheme.acento, tamano: 28),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '$total ${total == 1 ? 'profesional' : 'profesionales'}',
+                  style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800),
+                ),
+                const Text(
+                  'Toca el botón verde para escribir por WhatsApp.',
+                  style: TextStyle(color: Colors.white70, fontSize: 13),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

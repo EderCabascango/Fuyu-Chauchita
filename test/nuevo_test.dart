@@ -107,9 +107,14 @@ void main() {
 
     test('las tarjetas alternan colores como mosaico', () {
       expect(EstiloOficio.para(0).fondo, Colors.white);
-      expect(EstiloOficio.para(1).fondo, AppTheme.durazno);
-      expect(EstiloOficio.para(3).fondo, AppTheme.azul);
+      expect(EstiloOficio.para(1).fondo, AppTheme.lila);
+      expect(EstiloOficio.para(2).fondo, EstiloOficio.crema);
       expect(EstiloOficio.para(4).fondo, Colors.white);
+    });
+
+    test('Delivery y Arreglos florales tienen ícono', () {
+      expect(iconoOficio('delivery_dining'), Icons.delivery_dining);
+      expect(iconoOficio('local_florist'), Icons.local_florist);
     });
   });
 

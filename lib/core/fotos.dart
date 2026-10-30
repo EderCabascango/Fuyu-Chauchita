@@ -47,7 +47,9 @@ Future<Uint8List> comprimir(Uint8List original) async {
 Future<String> subirFoto(Uint8List bytes, {required String prefijo}) async {
   final uid = supabase.auth.currentUser!.id;
   final ruta = '$uid/${prefijo}_${DateTime.now().millisecondsSinceEpoch}.jpg';
-  await supabase.storage.from(_bucket).uploadBinary(
+  await supabase.storage
+      .from(_bucket)
+      .uploadBinary(
         ruta,
         bytes,
         fileOptions: const FileOptions(contentType: 'image/jpeg', cacheControl: '31536000'),

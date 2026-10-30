@@ -11,9 +11,9 @@ class PrivacidadPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final texto = Theme.of(context).textTheme;
     Widget titulo(String t) => Padding(
-          padding: const EdgeInsets.only(top: 20, bottom: 6),
-          child: Text(t, style: texto.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-        );
+      padding: const EdgeInsets.only(top: 20, bottom: 6),
+      child: Text(t, style: texto.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+    );
 
     return Scaffold(
       appBar: AppBar(title: const Text('Privacidad y términos')),
@@ -60,10 +60,7 @@ class PrivacidadPage extends StatelessWidget {
               label: const Text('Política de privacidad completa'),
             ),
           ],
-          if (correoSoporte.isNotEmpty) ...[
-            titulo('Contacto'),
-            SelectableText(correoSoporte),
-          ],
+          if (correoSoporte.isNotEmpty) ...[titulo('Contacto'), SelectableText(correoSoporte)],
         ],
       ),
     );
