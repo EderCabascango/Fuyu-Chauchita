@@ -72,9 +72,6 @@ class AppTheme {
   /// Poppins. En pruebas se desactiva para no descargar la fuente.
   static bool usarPoppins = true;
 
-  /// Letra serif elegante (Cormorant Garamond) para la firma de Fuyu.
-  static TextStyle elegante(TextStyle base) => usarPoppins ? GoogleFonts.cormorantGaramond(textStyle: base) : base;
-
   static TextTheme _texto(TextTheme base) {
     final t = usarPoppins ? GoogleFonts.poppinsTextTheme(base) : base;
     return t.apply(bodyColor: tinta, displayColor: azul).copyWith(

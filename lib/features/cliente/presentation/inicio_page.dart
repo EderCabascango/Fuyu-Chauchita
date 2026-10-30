@@ -225,7 +225,15 @@ class _TabInicioState extends State<_TabInicio> {
                     children: [
                       Image.asset('assets/marca/pin.png', height: 36, semanticLabel: 'Chauchita'),
                       const SizedBox(width: 8),
-                      Image.asset('assets/marca/chauchita.png', height: 22, excludeFromSemantics: true),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Image.asset('assets/marca/chauchita.png', height: 22, excludeFromSemantics: true),
+                          const SizedBox(height: 3),
+                          const FirmaFuyu(compacta: true),
+                        ],
+                      ),
                       const Spacer(),
                       _BotonZona(nombre: zona ?? 'Todo el cantón', onTap: _cambiarParroquia),
                     ],

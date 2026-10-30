@@ -271,39 +271,33 @@ class BotonCircular extends StatelessWidget {
   );
 }
 
-/// Firma "un producto de Fuyu" en gris, con letra serif elegante.
+/// Firma "UN PRODUCTO DE FUYU": mayúsculas pequeñas, finas y espaciadas, en gris.
+/// `compacta`: versión mini para ir debajo del logo en la cabecera.
 class FirmaFuyu extends StatelessWidget {
-  const FirmaFuyu({super.key});
+  const FirmaFuyu({super.key, this.compacta = false});
+
+  final bool compacta;
 
   @override
   Widget build(BuildContext context) {
+    final base = Theme.of(context).textTheme.bodySmall!.copyWith(
+      fontSize: compacta ? 8.5 : 11,
+      letterSpacing: compacta ? 1.5 : 3.2,
+      color: AppTheme.gris,
+      height: 1.2,
+    );
     return Semantics(
       label: 'Un producto de Fuyu',
       excludeSemantics: true,
       child: Text.rich(
         TextSpan(
           children: [
-            TextSpan(
-              text: 'un producto de  ',
-              style: AppTheme.elegante(
-                const TextStyle(
-                  fontSize: 17,
-                  fontStyle: FontStyle.italic,
-                  fontWeight: FontWeight.w500,
-                  color: AppTheme.gris,
-                  letterSpacing: 0.3,
-                ),
-              ),
-            ),
-            TextSpan(
-              text: 'Fuyu',
-              style: AppTheme.elegante(
-                const TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: AppTheme.gris, letterSpacing: 1.2),
-              ),
-            ),
+            TextSpan(text: 'UN PRODUCTO DE ', style: base.copyWith(fontWeight: FontWeight.w300)),
+            TextSpan(text: 'FUYU', style: base.copyWith(fontWeight: FontWeight.w600)),
           ],
         ),
-        textAlign: TextAlign.center,
+        maxLines: 1,
+        textScaler: compacta ? TextScaler.noScaling : null,
       ),
     );
   }
