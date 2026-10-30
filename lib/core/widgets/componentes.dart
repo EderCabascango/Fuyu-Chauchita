@@ -20,7 +20,8 @@ class PrimaryButton extends StatelessWidget {
             height: 24,
             child: CircularProgressIndicator(strokeWidth: 2.6, color: Colors.white),
           )
-        : Text(texto);
+        // Una sola línea: si no cabe, la letra se achica un poco en vez de partirse.
+        : FittedBox(fit: BoxFit.scaleDown, child: Text(texto, maxLines: 1));
     return SizedBox(
       width: double.infinity,
       child: icono == null || cargando

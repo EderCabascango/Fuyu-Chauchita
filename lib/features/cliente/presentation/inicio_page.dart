@@ -306,19 +306,21 @@ class _TabInicioState extends State<_TabInicio> {
                                 : 'Todavía no hay profesionales de ${_oficio!.nombre}.',
                           )
                         else
-                          GridView.builder(
-                            shrinkWrap: true,
-                            padding: EdgeInsets.zero,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: mejores.length,
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              mainAxisSpacing: 14,
-                              crossAxisSpacing: 14,
-                              mainAxisExtent: 262,
+                          LayoutBuilder(
+                            builder: (context, medidas) => GridView.builder(
+                              shrinkWrap: true,
+                              padding: EdgeInsets.zero,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: mejores.length,
+                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                mainAxisSpacing: 14,
+                                crossAxisSpacing: 14,
+                                mainAxisExtent: WorkerCard.alto(context, (medidas.maxWidth - 14) / 2),
+                              ),
+                              itemBuilder: (_, i) =>
+                                  WorkerCard(profesional: mejores[i], onTap: () => _abrirPerfil(mejores[i])),
                             ),
-                            itemBuilder: (_, i) =>
-                                WorkerCard(profesional: mejores[i], onTap: () => _abrirPerfil(mejores[i])),
                           ),
                         TituloSeccion(
                           zona == null ? 'Cerca de ti' : 'Cerca de ti · $zona',

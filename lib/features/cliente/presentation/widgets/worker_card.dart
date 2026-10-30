@@ -58,6 +58,14 @@ class WorkerCard extends StatelessWidget {
   final Profesional profesional;
   final VoidCallback onTap;
 
+  /// Alto justo de la tarjeta para un ancho dado (foto + 3 líneas de texto),
+  /// respetando el tamaño de letra que el usuario eligió en su teléfono.
+  static double alto(BuildContext context, double ancho) {
+    final foto = (ancho - 20) / 1.1;
+    final texto = MediaQuery.textScalerOf(context).scale(62);
+    return foto + texto + 42;
+  }
+
   @override
   Widget build(BuildContext context) {
     final p = profesional;

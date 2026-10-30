@@ -203,22 +203,33 @@ class _Contenido extends StatelessWidget {
                               : '${p.totalResenas} ${p.totalResenas == 1 ? 'reseña' : 'reseñas'}',
                         ),
                       ),
-                      _Separador(),
-                      Expanded(
-                        child: _Dato(
-                          icono: Icons.workspace_premium_outlined,
-                          valor: p.aniosExperiencia == null ? '—' : '${p.aniosExperiencia}',
-                          etiqueta: p.aniosExperiencia == 1 ? 'año de exp.' : 'años de exp.',
+                      // Años y precio son opcionales: solo se muestran si el profesional los llenó.
+                      if (p.aniosExperiencia != null) ...[
+                        _Separador(),
+                        Expanded(
+                          child: _Dato(
+                            icono: Icons.workspace_premium_outlined,
+                            valor: '${p.aniosExperiencia}',
+                            etiqueta: p.aniosExperiencia == 1 ? 'año de exp.' : 'años de exp.',
+                          ),
                         ),
-                      ),
-                      _Separador(),
-                      Expanded(
-                        child: _Dato(
-                          icono: Icons.payments_outlined,
-                          valor: p.precioTexto ?? '—',
-                          etiqueta: 'desde',
+                      ],
+                      if (p.precioTexto != null) ...[
+                        _Separador(),
+                        Expanded(
+                          child: _Dato(icono: Icons.payments_outlined, valor: p.precioTexto!, etiqueta: 'desde'),
                         ),
-                      ),
+                      ],
+                      if (p.fotos.isNotEmpty && (p.aniosExperiencia == null || p.precioTexto == null)) ...[
+                        _Separador(),
+                        Expanded(
+                          child: _Dato(
+                            icono: Icons.photo_library_outlined,
+                            valor: '${p.fotos.length}',
+                            etiqueta: p.fotos.length == 1 ? 'trabajo' : 'trabajos',
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                   if (p.parroquias.isNotEmpty) ...[

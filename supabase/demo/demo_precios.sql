@@ -5,5 +5,6 @@ set precio_desde = (array[10, 12, 15, 20, 25, 30])[1 + (abs(hashtext(p.id::text)
     anios_experiencia = 2 + (abs(hashtext(p.nombre_publico)) % 18),
     servicios = array['Instalaciones', 'Reparaciones', 'Mantenimiento', 'Emergencias 24h']
                 [1 : 2 + (abs(hashtext(p.id::text)) % 3)]
-from public.usuarios u
-where u.id = p.usuario_id and u.telefono like '5930000%';
+from auth.users u
+where u.id = p.usuario_id and u.phone like '5930000%'
+returning p.nombre_publico, p.precio_desde, p.anios_experiencia;
