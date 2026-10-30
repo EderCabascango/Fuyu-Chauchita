@@ -70,7 +70,7 @@ class _ResenaPageState extends State<ResenaPage> {
                   iconSize: 44,
                   tooltip: '$i ${i == 1 ? 'estrella' : 'estrellas'}',
                   onPressed: () => setState(() => _estrellas = i),
-                  icon: Icon(i <= _estrellas ? Icons.star_rounded : Icons.star_outline_rounded, color: AppTheme.ambar),
+                  icon: Icon(i <= _estrellas ? Icons.star_rounded : Icons.star_outline_rounded, color: AppTheme.amarillo),
                 ),
             ],
           ),

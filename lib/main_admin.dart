@@ -18,7 +18,7 @@ Future<void> main() async {
 
   runApp(
     MaterialApp(
-      title: 'Oficios Cayambe · Admin',
+      title: 'Chauchita · Admin',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.claro,
       home: errorConfig == null ? const AdminApp() : Scaffold(body: MensajeError(mensaje: errorConfig)),

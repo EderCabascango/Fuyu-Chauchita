@@ -34,6 +34,24 @@ class RepoFalso extends ClienteRepositorio {
         Parroquia(id: 1, nombre: 'Cayambe'),
         Parroquia(id: 2, nombre: 'Ayora'),
       ];
+
+  final pedidos = <String>[];
+
+  @override
+  Future<List<Profesional>> buscar({int? oficioId, int? parroquiaId, int? limite, bool mejorCalificados = false}) async {
+    pedidos.add('${mejorCalificados ? 'mejores' : 'cerca'}:$oficioId');
+    return [
+      Profesional(
+        id: mejorCalificados ? 'a' : 'b',
+        nombrePublico: mejorCalificados ? 'Ana Mejor' : 'Beto Cerca',
+        whatsapp: '593991234567',
+        disponibleAhora: false,
+        verificado: false,
+        promedioEstrellas: 4.9,
+        totalResenas: 10,
+      ),
+    ];
+  }
 }
 
 void main() {
@@ -105,13 +123,6 @@ void main() {
       expect(iconoOficio('local_taxi'), Icons.local_taxi);
     });
 
-    test('las tarjetas alternan colores como mosaico', () {
-      expect(EstiloOficio.para(0).fondo, Colors.white);
-      expect(EstiloOficio.para(1).fondo, AppTheme.lila);
-      expect(EstiloOficio.para(2).fondo, EstiloOficio.crema);
-      expect(EstiloOficio.para(4).fondo, Colors.white);
-    });
-
     test('Delivery y Arreglos florales tienen ícono', () {
       expect(iconoOficio('delivery_dining'), Icons.delivery_dining);
       expect(iconoOficio('local_florist'), Icons.local_florist);
@@ -126,20 +137,30 @@ void main() {
     expect(uri.fragment, isEmpty);
   });
 
-  testWidgets('inicio muestra los oficios nuevos y el botón de profesional', (tester) async {
+  testWidgets('inicio: chips, mejor calificados, cerca de ti y botón central', (tester) async {
     SharedPreferences.setMockInitialValues({});
-    await tester.binding.setSurfaceSize(const Size(420, 1600));
-    await tester.pumpWidget(MaterialApp(theme: AppTheme.claro, home: InicioPage(repo: RepoFalso())));
+    await tester.binding.setSurfaceSize(const Size(420, 2000));
+    final repo = RepoFalso();
+    await tester.pumpWidget(MaterialApp(theme: AppTheme.claro, home: InicioPage(repo: repo)));
     await tester.pumpAndSettle();
 
-    expect(find.text('Cámaras de seguridad'), findsOneWidget);
-    expect(find.text('Técnico en telecomunicaciones'), findsOneWidget);
-    expect(find.text('Técnico en computadoras'), findsOneWidget);
-    expect(find.text('Taxis'), findsOneWidget);
+    expect(find.text('Todos'), findsOneWidget);
+    expect(find.text('Electricista'), findsOneWidget);
+    expect(find.text('Mejor calificados'), findsOneWidget);
+    expect(find.text('Ana Mejor'), findsOneWidget);
+    expect(find.text('Cerca de ti'), findsOneWidget);
+    expect(find.text('Beto Cerca'), findsOneWidget);
     expect(find.text('Todo el cantón'), findsOneWidget);
-    expect(find.text('¿Eres profesional?'), findsOneWidget);
-    expect(find.byTooltip('Soy profesional'), findsOneWidget);
+    expect(find.byTooltip('Publicar mi servicio'), findsOneWidget);
+    for (final t in ['Inicio', 'Buscar', 'Favoritos', 'Perfil']) {
+      expect(find.text(t), findsOneWidget, reason: t);
+    }
     expect(find.textContaining('maestro'), findsNothing);
+
+    // Al tocar un chip se filtran las secciones por ese oficio.
+    await tester.tap(find.text('Electricista'));
+    await tester.pumpAndSettle();
+    expect(repo.pedidos, containsAll(['mejores:1', 'cerca:1']));
     await tester.binding.setSurfaceSize(null);
   });
 

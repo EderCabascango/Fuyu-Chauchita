@@ -44,6 +44,7 @@ dependencies:
   firebase_core: ^5.1.0
   firebase_messaging: ^17.0.1
   google_sign_in: ^7.2.0
+  google_fonts: ^8.1.0
 
 dev_dependencies:
   flutter_test:
@@ -73,6 +74,7 @@ flutter:
     - .env
     - assets/oficios/
     - assets/ilustraciones/
+    - assets/marca/
 
   # To add assets to your application, add an assets section, like this:
   # assets:
@@ -111,10 +113,10 @@ flutter_launcher_icons:
   ios: false
   image_path: "assets/icono/icono.png"
   min_sdk_android: 21
-  adaptive_icon_background: "#6A3FD8"
+  adaptive_icon_background: "#FFFFFF"
   adaptive_icon_foreground: "assets/icono/frente.png"
   web:
     generate: true
     image_path: "assets/icono/icono.png"
-    background_color: "#6A3FD8"
-    theme_color: "#6A3FD8"
+    background_color: "#FAF8F5"
+    theme_color: "#F07E1B"

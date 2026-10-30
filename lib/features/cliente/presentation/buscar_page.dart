@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import '../../../core/iconos_oficio.dart';
 import '../../../core/theme/app_theme.dart';
 import '../data/cliente_repositorio.dart';
-import '../data/contacto.dart';
 import '../data/modelos.dart';
 import 'perfil_page.dart';
-import 'widgets/tarjeta_profesional.dart';
+import 'widgets/worker_card.dart';
+import '../../../core/widgets/componentes.dart';
 import 'widgets/vacio.dart';
 
 /// Busca por oficio (en el teléfono) y por nombre de profesional (en el servidor).
@@ -92,7 +92,7 @@ class _BuscarPageState extends State<BuscarPage> {
           const SizedBox(height: 4),
           const Text('Escribe un oficio o el nombre de un profesional.', style: TextStyle(color: AppTheme.gris)),
           const SizedBox(height: 16),
-          CampoBusqueda(controller: _ctrl, focusNode: _foco, onChanged: _cambio),
+          ChauchitaSearchBar(controller: _ctrl, focusNode: _foco, onChanged: _cambio),
           TituloSeccion(buscando ? 'Oficios' : 'Todos los oficios'),
           if (oficios.isEmpty)
             const Text('Ningún oficio con ese nombre.', style: TextStyle(color: AppTheme.gris))
@@ -131,11 +131,7 @@ class _BuscarPageState extends State<BuscarPage> {
                       for (final p in lista)
                         Padding(
                           padding: const EdgeInsets.only(bottom: 12),
-                          child: TarjetaProfesional(
-                            profesional: p,
-                            onTap: () => _abrirPerfil(p),
-                            onWhatsapp: () => contactar(widget.repo, p, CanalContacto.whatsapp),
-                          ),
+                          child: WorkerCardHorizontal(profesional: p, onTap: () => _abrirPerfil(p)),
                         ),
                     ],
                   );
@@ -143,48 +139,6 @@ class _BuscarPageState extends State<BuscarPage> {
               ),
           ],
         ],
-      ),
-    );
-  }
-}
-
-/// Barra de búsqueda redondeada. Con `onTap` funciona como botón (no se escribe).
-class CampoBusqueda extends StatelessWidget {
-  const CampoBusqueda({super.key, this.controller, this.focusNode, this.onChanged, this.onTap});
-
-  final TextEditingController? controller;
-  final FocusNode? focusNode;
-  final ValueChanged<String>? onChanged;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(22), boxShadow: AppTheme.sombra),
-      child: TextField(
-        controller: controller,
-        focusNode: focusNode,
-        onChanged: onChanged,
-        readOnly: onTap != null,
-        onTap: onTap,
-        maxLength: 40,
-        textInputAction: TextInputAction.search,
-        decoration: InputDecoration(
-          hintText: 'Buscar oficio o profesional…',
-          counterText: '',
-          prefixIcon: const Icon(Icons.search_rounded, color: AppTheme.morado),
-          suffixIcon: Container(
-            margin: const EdgeInsets.all(7),
-            decoration: BoxDecoration(color: AppTheme.acento, borderRadius: BorderRadius.circular(14)),
-            child: const Icon(Icons.tune_rounded, color: AppTheme.tinta, size: 20),
-          ),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(22), borderSide: BorderSide.none),
-          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(22), borderSide: BorderSide.none),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(22),
-            borderSide: const BorderSide(color: AppTheme.morado, width: 2),
-          ),
-        ),
       ),
     );
   }
@@ -211,8 +165,8 @@ class _ChipOficio extends StatelessWidget {
               width: 34,
               height: 34,
               alignment: Alignment.center,
-              decoration: BoxDecoration(color: AppTheme.lila, borderRadius: BorderRadius.circular(12)),
-              child: IconoOficio(clave: oficio.icono, tamano: 19, color: AppTheme.morado),
+              decoration: BoxDecoration(color: AppTheme.crema, borderRadius: BorderRadius.circular(12)),
+              child: IconoOficio(clave: oficio.icono, tamano: 19, color: AppTheme.naranjaBoton),
             ),
             const SizedBox(width: 8),
             Text(oficio.nombre, style: const TextStyle(fontWeight: FontWeight.w700)),

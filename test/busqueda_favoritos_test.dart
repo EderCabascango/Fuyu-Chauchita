@@ -138,13 +138,15 @@ void main() {
     await tester.pumpWidget(MaterialApp(
       home: ArranquePage(
         preparar: () async => null,
-        duracionMinima: const Duration(milliseconds: 300),
+        duracionMinima: const Duration(milliseconds: 600),
         destino: (error) => Text(error ?? 'listo'),
       ),
     ));
     await tester.pump(const Duration(milliseconds: 100));
-    expect(find.textContaining('Oficios'), findsOneWidget);
-    expect(find.text('Profesionales de confianza cerca de ti'), findsOneWidget);
+    expect(find.bySemanticsLabel('Chauchita'), findsOneWidget);
+    await tester.pump(const Duration(milliseconds: 350));
+    expect(find.text('Profesionales de confianza en Cayambe'), findsOneWidget);
+    expect(find.bySemanticsLabel('Un producto de Fuyu'), findsOneWidget);
     await tester.pump(const Duration(milliseconds: 400));
     await tester.pumpAndSettle();
     expect(find.text('listo'), findsOneWidget);

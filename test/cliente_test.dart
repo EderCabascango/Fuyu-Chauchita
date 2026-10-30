@@ -4,7 +4,7 @@ import 'package:oficios_cayambe/core/iconos_oficio.dart';
 import 'package:oficios_cayambe/core/theme/app_theme.dart';
 import 'package:oficios_cayambe/features/cliente/data/contacto.dart';
 import 'package:oficios_cayambe/features/cliente/data/modelos.dart';
-import 'package:oficios_cayambe/features/cliente/presentation/widgets/tarjeta_profesional.dart';
+import 'package:oficios_cayambe/features/cliente/presentation/widgets/worker_card.dart';
 
 /// Fila tal como la devuelve Supabase para un perfil completo.
 final filaPerfil = <String, dynamic>{
@@ -72,7 +72,7 @@ void main() {
       expect(uri.host, 'wa.me');
       expect(uri.path, '/593991234567');
       expect(uri.queryParameters['text'],
-          'Hola, te encontré en Oficios Cayambe. Quisiera consultarte por un trabajo de plomero.');
+          'Hola, te encontré en Chauchita. Quisiera consultarte por un trabajo de plomero.');
       expect(uri.toString(), isNot(contains(' ')));
     });
 
@@ -87,26 +87,38 @@ void main() {
     expect(iconoOficio(null), Icons.handyman);
   });
 
-  testWidgets('tarjeta muestra nombre, calificación, zonas y disponibilidad', (tester) async {
-    var whatsapp = 0;
-    await tester.pumpWidget(MaterialApp(
-      theme: AppTheme.claro,
-      home: Scaffold(
-        body: TarjetaProfesional(
-          profesional: Profesional.fromMap(filaPerfil),
-          onTap: () {},
-          onWhatsapp: () => whatsapp++,
-        ),
-      ),
-    ));
+  testWidgets('tarjetas muestran nombre, oficio, calificación, zona, precio y disponibilidad', (tester) async {
+    final p = Profesional.fromMap({...filaPerfil, 'fotos_trabajo': [], 'precio_desde': 15, 'anios_experiencia': 8});
+    var toques = 0;
+    for (final tarjeta in [
+      WorkerCardHorizontal(profesional: p, onTap: () => toques++),
+      SizedBox(width: 190, height: 270, child: WorkerCard(profesional: p, onTap: () => toques++)),
+    ]) {
+      await tester.pumpWidget(MaterialApp(theme: AppTheme.claro, home: Scaffold(body: Center(child: tarjeta))));
+      expect(find.text('Rosa Imbaquingo'), findsOneWidget);
+      expect(find.text('Plomero'), findsOneWidget);
+      expect(find.text('4.8 (2)'), findsOneWidget);
+      expect(find.text('Cayambe +1'), findsOneWidget);
+      expect(find.text('Desde \$15'), findsOneWidget);
+      expect(find.text('RI'), findsOneWidget, reason: 'sin foto muestra las iniciales');
+      expect(find.byTooltip('Guardar en favoritos'), findsOneWidget);
+      await tester.tap(find.text('Rosa Imbaquingo'));
+    }
+    expect(toques, 2);
+  });
 
-    expect(find.text('Rosa Imbaquingo'), findsOneWidget);
-    expect(find.text('4.8'), findsOneWidget);
-    expect(find.text('Cayambe, Juan Montalvo'), findsOneWidget);
-    expect(find.text('Disponible ahora'), findsOneWidget);
-    expect(find.byIcon(Icons.verified_rounded), findsOneWidget);
-
-    await tester.tap(find.byTooltip('Escribir por WhatsApp'));
-    expect(whatsapp, 1);
+  test('precio, experiencia, servicios y foto de portada', () {
+    final p = Profesional.fromMap({
+      ...filaPerfil,
+      'precio_desde': 12.5,
+      'anios_experiencia': 3,
+      'servicios': ['Instalaciones', 'Emergencias 24h'],
+    });
+    expect(p.precioTexto, '\$12,50');
+    expect(p.aniosExperiencia, 3);
+    expect(p.servicios, ['Instalaciones', 'Emergencias 24h']);
+    expect(p.fotoPortada, 'https://x/1.jpg', reason: 'sin foto de perfil usa la primera de trabajos');
+    expect(Profesional.fromMap({...filaPerfil, 'precio_desde': 15}).precioTexto, '\$15');
+    expect(Profesional.fromMap(filaPerfil).precioTexto, isNull);
   });
 }

@@ -393,19 +393,19 @@ class _BannerEstado extends StatelessWidget {
   Widget build(BuildContext context) {
     final (color, icono, titulo, detalle) = switch (estado) {
       'aprobado' => (
-        const Color(0xFFE6F4EA),
+        AppTheme.fondoExito,
         Icons.check_circle_rounded,
         'Tu perfil está publicado',
         'Los clientes ya pueden encontrarte y escribirte.',
       ),
       'suspendido' => (
-        const Color(0xFFFCE8E6),
+        AppTheme.fondoError,
         Icons.block_rounded,
         'Tu perfil está suspendido',
         'No aparece en las búsquedas. Escríbenos si crees que es un error.',
       ),
       _ => (
-        const Color(0xFFFEF7E0),
+        AppTheme.fondoAviso,
         Icons.hourglass_top_rounded,
         'Pendiente de aprobación',
         'Revisaremos tu perfil pronto. Te avisaremos cuando esté publicado.',

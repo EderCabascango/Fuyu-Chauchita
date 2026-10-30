@@ -63,6 +63,9 @@ class Profesional {
     required this.promedioEstrellas,
     required this.totalResenas,
     this.estado,
+    this.precioDesde,
+    this.aniosExperiencia,
+    this.servicios = const [],
     this.oficios = const [],
     this.parroquias = const [],
     this.fotos = const [],
@@ -84,6 +87,13 @@ class Profesional {
 
   /// pendiente / aprobado / suspendido (solo viene en "mi perfil" y en admin).
   final String? estado;
+
+  /// "Desde $15" (opcional).
+  final double? precioDesde;
+  final int? aniosExperiencia;
+
+  /// Servicios cortos: "Instalaciones", "Emergencias 24h"…
+  final List<String> servicios;
   final List<Oficio> oficios;
   final List<Parroquia> parroquias;
   final List<FotoTrabajo> fotos;
@@ -106,11 +116,24 @@ class Profesional {
       promedioEstrellas: (m['promedio_estrellas'] as num?)?.toDouble() ?? 0,
       totalResenas: (m['total_resenas'] as num?)?.toInt() ?? 0,
       estado: m['estado'] as String?,
+      precioDesde: (m['precio_desde'] as num?)?.toDouble(),
+      aniosExperiencia: (m['anios_experiencia'] as num?)?.toInt(),
+      servicios: [for (final s in (m['servicios'] as List?) ?? const []) s as String],
       oficios: lista('oficios', Oficio.fromMap),
       parroquias: lista('parroquias', Parroquia.fromMap),
       fotos: lista('fotos_trabajo', FotoTrabajo.fromMap)..sort((a, b) => a.orden.compareTo(b.orden)),
       resenas: lista('resenas', Resena.fromMap)..sort((a, b) => b.creadoEn.compareTo(a.creadoEn)),
     );
+  }
+
+  /// Foto para tarjetas: la de perfil o, si no hay, la primera de sus trabajos.
+  String? get fotoPortada => fotoUrl ?? (fotos.isEmpty ? null : fotos.first.url);
+
+  /// "$15" o "$12,50".
+  String? get precioTexto {
+    final p = precioDesde;
+    if (p == null) return null;
+    return p == p.roundToDouble() ? '\$${p.toInt()}' : '\$${p.toStringAsFixed(2).replaceAll('.', ',')}';
   }
 
   String get iniciales {

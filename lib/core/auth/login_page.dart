@@ -99,29 +99,14 @@ class _LoginPageState extends State<LoginPage> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
           children: [
-            Container(
-              padding: const EdgeInsets.all(22),
-              decoration: BoxDecoration(gradient: AppTheme.degradado, borderRadius: BorderRadius.circular(26)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(color: const Color(0x1FFFFFFF), borderRadius: BorderRadius.circular(14)),
-                    child: const Icon(Icons.lock_open_rounded, color: AppTheme.acento),
-                  ),
-                  const SizedBox(height: 14),
-                  Text(
-                    widget.motivo,
-                    style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800),
-                  ),
-                  const SizedBox(height: 6),
-                  const Text(
-                    'Sin contraseñas. Entra con Google o con un código que te enviamos al correo.',
-                    style: TextStyle(color: Colors.white70, height: 1.35),
-                  ),
-                ],
-              ),
+            Center(child: Image.asset('assets/marca/logo.png', height: 132, semanticLabel: 'Chauchita')),
+            const SizedBox(height: 22),
+            Text(widget.motivo, textAlign: TextAlign.center, style: Theme.of(context).textTheme.headlineSmall),
+            const SizedBox(height: 6),
+            Text(
+              'Sin contraseñas. Entra con Google o con un código que te enviamos al correo.',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppTheme.gris),
             ),
             const SizedBox(height: 24),
             if (!enviado) ...[
@@ -168,7 +153,7 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 14),
               FilledButton(
                 onPressed: _ocupado ? null : _enviarCodigo,
-                style: AppTheme.botonAcento,
+                
                 child: _ocupado ? const _Cargando() : const Text('Enviarme un código'),
               ),
             ] else ...[
@@ -224,7 +209,7 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 14),
               Container(
                 padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(color: const Color(0xFFFDECEA), borderRadius: BorderRadius.circular(14)),
+                decoration: BoxDecoration(color: AppTheme.fondoError, borderRadius: BorderRadius.circular(14)),
                 child: Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
               ),
             ],
@@ -255,6 +240,6 @@ class _LetraG extends StatelessWidget {
   @override
   Widget build(BuildContext context) => const Text(
     'G',
-    style: TextStyle(color: Color(0xFF4285F4), fontWeight: FontWeight.w900, fontSize: 20),
+    style: TextStyle(color: AppTheme.azulGoogle, fontWeight: FontWeight.w900, fontSize: 20),
   );
 }

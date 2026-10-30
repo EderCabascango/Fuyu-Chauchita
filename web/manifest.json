@@ -1,11 +1,11 @@
 {
-    "name": "Oficios Cayambe · Admin",
+    "name": "Chauchita · Admin",
     "short_name": "Admin Oficios",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#6A3FD8",
-    "theme_color": "#6A3FD8",
-    "description": "Panel de administración de Oficios Cayambe",
+    "background_color": "#FAF8F5",
+    "theme_color": "#F07E1B",
+    "description": "Panel de administración de Chauchita",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

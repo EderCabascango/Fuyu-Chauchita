@@ -10,6 +10,11 @@ import '../../cliente/data/cliente_repositorio.dart';
 import '../../cliente/data/modelos.dart';
 import '../data/profesional_repositorio.dart';
 
+const maxServicios = 8;
+
+/// Servicios comunes para elegir con un toque.
+const sugerenciasServicios = ['Instalaciones', 'Reparaciones', 'Mantenimiento', 'Emergencias 24h', 'Presupuesto gratis'];
+
 /// ¿Las parroquias elegidas cubren todo el cantón?
 bool todoElCanton(Set<int> elegidas, List<Parroquia> todas) =>
     todas.isNotEmpty && todas.every((p) => elegidas.contains(p.id));
@@ -36,6 +41,10 @@ class _EditarPerfilPageState extends State<EditarPerfilPage> {
   );
   late final _descripcion = TextEditingController(text: widget.actual?.descripcion);
   late final _horario = TextEditingController(text: widget.actual?.horario);
+  late final _precio = TextEditingController(text: widget.actual?.precioDesde?.toStringAsFixed(0));
+  late final _experiencia = TextEditingController(text: widget.actual?.aniosExperiencia?.toString());
+  final _servicioNuevo = TextEditingController();
+  late final List<String> _servicios = [...?widget.actual?.servicios];
   late final Set<int> _oficios = {...?widget.actual?.oficios.map((o) => o.id)};
   late final Set<int> _parroquias = {...?widget.actual?.parroquias.map((p) => p.id)};
   Uint8List? _fotoNueva;
@@ -58,7 +67,7 @@ class _EditarPerfilPageState extends State<EditarPerfilPage> {
 
   @override
   void dispose() {
-    for (final c in [_nombre, _whatsapp, _descripcion, _horario]) {
+    for (final c in [_nombre, _whatsapp, _descripcion, _horario, _precio, _experiencia, _servicioNuevo]) {
       c.dispose();
     }
     super.dispose();
@@ -106,6 +115,9 @@ class _EditarPerfilPageState extends State<EditarPerfilPage> {
       whatsapp: normalizarCelular(_whatsapp.text)!,
       descripcion: _descripcion.text,
       horario: _horario.text,
+      precioDesde: double.tryParse(_precio.text.replaceAll(',', '.')),
+      aniosExperiencia: int.tryParse(_experiencia.text),
+      servicios: _servicios,
       oficioIds: _oficios,
       parroquiaIds: _parroquias,
     );
@@ -126,6 +138,13 @@ class _EditarPerfilPageState extends State<EditarPerfilPage> {
     } finally {
       if (mounted) setState(() => _guardando = false);
     }
+  }
+
+  void _agregarServicio() {
+    final s = _servicioNuevo.text.trim();
+    if (s.length < 2 || _servicios.contains(s) || _servicios.length >= maxServicios) return;
+    setState(() => _servicios.add(s));
+    _servicioNuevo.clear();
   }
 
   @override
@@ -203,6 +222,75 @@ class _EditarPerfilPageState extends State<EditarPerfilPage> {
                     hintText: 'Ej.: Lun a sáb, 7:00 a 18:00',
                     prefixIcon: Icon(Icons.schedule),
                   ),
+                ),
+                const SizedBox(height: 14),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: _precio,
+                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')), LengthLimitingTextInputFormatter(7)],
+                        decoration: const InputDecoration(labelText: 'Precio desde', prefixText: '\$ ', hintText: '15'),
+                        validator: (v) {
+                          if ((v ?? '').trim().isEmpty) return null;
+                          final n = double.tryParse(v!.replaceAll(',', '.'));
+                          return (n == null || n < 1 || n > 10000) ? 'Entre 1 y 10 000' : null;
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextFormField(
+                        controller: _experiencia,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(2)],
+                        decoration: const InputDecoration(labelText: 'Años de experiencia', hintText: '5'),
+                        validator: (v) {
+                          if ((v ?? '').trim().isEmpty) return null;
+                          final n = int.tryParse(v!);
+                          return (n == null || n > 70) ? 'Entre 0 y 70' : null;
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 22),
+                Text('Servicios que ofreces', style: texto.titleMedium),
+                const SizedBox(height: 4),
+                Text('Hasta $maxServicios. Toca una sugerencia o escribe el tuyo.',
+                    style: texto.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                const SizedBox(height: 8),
+                Wrap(spacing: 8, runSpacing: 8, children: [
+                  for (final s in {..._servicios, ...sugerenciasServicios})
+                    FilterChip(
+                      label: Text(s),
+                      selected: _servicios.contains(s),
+                      onSelected: (marcado) => setState(() {
+                        if (!marcado) {
+                          _servicios.remove(s);
+                        } else if (_servicios.length < maxServicios) {
+                          _servicios.add(s);
+                        }
+                      }),
+                    ),
+                ]),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: _servicioNuevo,
+                  maxLength: 40,
+                  textCapitalization: TextCapitalization.sentences,
+                  decoration: InputDecoration(
+                    labelText: 'Otro servicio',
+                    counterText: '',
+                    suffixIcon: IconButton(
+                      tooltip: 'Agregar servicio',
+                      icon: const Icon(Icons.add_circle_outline),
+                      onPressed: _agregarServicio,
+                    ),
+                  ),
+                  onSubmitted: (_) => _agregarServicio(),
                 ),
                 const SizedBox(height: 22),
                 Text('¿Qué oficios haces? *', style: texto.titleMedium),

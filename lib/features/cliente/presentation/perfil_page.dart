@@ -3,16 +3,16 @@ import 'package:flutter/material.dart';
 
 import '../../../core/auth/sesion.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/componentes.dart';
 import '../../../core/widgets/mensaje_error.dart';
 import '../data/cliente_repositorio.dart';
 import '../data/contacto.dart';
 import '../data/modelos.dart';
 import 'resena_page.dart';
-import 'widgets/avatar_profesional.dart';
 import 'widgets/boton_favorito.dart';
 import 'widgets/estrellas.dart';
-import 'widgets/insignias.dart';
 import 'widgets/reportar.dart';
+import 'widgets/worker_card.dart';
 
 /// Perfil público de un profesional. Muestra de inmediato los datos de la
 /// lista (`resumen`) y completa fotos y reseñas al cargar.
@@ -48,9 +48,7 @@ class _PerfilPageState extends State<PerfilPage> {
     if (!mounted) return;
     final cambio = await Navigator.push<bool>(
       context,
-      MaterialPageRoute(
-        builder: (_) => ResenaPage(repo: widget.repo, profesional: p, actual: actual),
-      ),
+      MaterialPageRoute(builder: (_) => ResenaPage(repo: widget.repo, profesional: p, actual: actual)),
     );
     if (cambio == true) _recargar();
   }
@@ -61,9 +59,7 @@ class _PerfilPageState extends State<PerfilPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            canal == CanalContacto.whatsapp
-                ? 'No se pudo abrir WhatsApp. ¿Está instalado?'
-                : 'No se pudo abrir el teléfono.',
+            canal == CanalContacto.whatsapp ? 'No se pudo abrir WhatsApp. ¿Está instalado?' : 'No se pudo abrir el teléfono.',
           ),
         ),
       );
@@ -81,40 +77,25 @@ class _PerfilPageState extends State<PerfilPage> {
 
         Widget cuerpo;
         if (!cargando && snapshot.hasError) {
-          cuerpo = MensajeError(
-            mensaje: 'No pudimos cargar el perfil.',
-            onReintentar: () => setState(() {
-              _perfil = widget.repo.perfil(widget.resumen.id);
-            }),
-          );
+          cuerpo = SafeArea(child: MensajeError(mensaje: 'No pudimos cargar el perfil.', onReintentar: _recargar));
         } else if (!cargando && completo == null) {
-          cuerpo = const MensajeError(mensaje: 'Este perfil ya no está disponible.');
+          cuerpo = const SafeArea(child: MensajeError(mensaje: 'Este perfil ya no está disponible.'));
         } else {
-          cuerpo = _ContenidoPerfil(
+          cuerpo = _Contenido(
             profesional: p,
             cargandoDetalle: cargando,
             vistaPrevia: widget.vistaPrevia,
             onCalificar: () => _calificar(p),
+            onReportarPerfil: () => reportar(context, repo: widget.repo, tipo: TipoReporte.perfil, objetivoId: p.id),
             onReportarResena: (r) => reportar(context, repo: widget.repo, tipo: TipoReporte.resena, objetivoId: r.id),
           );
         }
 
         return Scaffold(
-          appBar: AppBar(
-            title: widget.vistaPrevia ? const Text('Así te ven los clientes') : null,
-            actions: [
-              if (!widget.vistaPrevia) BotonFavorito(profesionalId: p.id),
-              if (!widget.vistaPrevia)
-                PopupMenuButton<String>(
-                  onSelected: (_) => reportar(context, repo: widget.repo, tipo: TipoReporte.perfil, objetivoId: p.id),
-                  itemBuilder: (_) => const [PopupMenuItem(value: 'reportar', child: Text('Reportar perfil'))],
-                ),
-            ],
-          ),
           body: cuerpo,
           bottomNavigationBar: widget.vistaPrevia
               ? null
-              : _BotonesContacto(
+              : _BarraContacto(
                   onWhatsapp: () => _contactar(p, CanalContacto.whatsapp),
                   onLlamar: () => _contactar(p, CanalContacto.llamada),
                 ),
@@ -124,12 +105,13 @@ class _PerfilPageState extends State<PerfilPage> {
   }
 }
 
-class _ContenidoPerfil extends StatelessWidget {
-  const _ContenidoPerfil({
+class _Contenido extends StatelessWidget {
+  const _Contenido({
     required this.profesional,
     required this.cargandoDetalle,
     required this.vistaPrevia,
     required this.onCalificar,
+    required this.onReportarPerfil,
     required this.onReportarResena,
   });
 
@@ -137,176 +119,257 @@ class _ContenidoPerfil extends StatelessWidget {
   final bool cargandoDetalle;
   final bool vistaPrevia;
   final VoidCallback onCalificar;
+  final VoidCallback onReportarPerfil;
   final ValueChanged<Resena> onReportarResena;
+
+  static const _altoFoto = 300.0;
 
   @override
   Widget build(BuildContext context) {
     final p = profesional;
     final texto = Theme.of(context).textTheme;
-    final gris = Theme.of(context).colorScheme.outline;
+    final arriba = MediaQuery.paddingOf(context).top;
+    final miResena = p.resenas.any((r) => r.clienteId != null && r.clienteId == usuarioActual?.id);
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
+      padding: const EdgeInsets.only(bottom: 24),
       children: [
-        // Encabezado
-        _Cabecera(profesional: p),
-
-        // Datos
-        if (p.verificado) ...[
-          const SizedBox(height: 14),
-          const _Aviso(
-            icono: Icons.verified_user_outlined,
-            texto: 'Verificado: revisamos su cédula y al menos 2 referencias.',
+        // Foto grande con botones encima
+        SizedBox(
+          height: _altoFoto + arriba,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              FotoProfesional(profesional: p, radio: 0, tamanoIniciales: 72),
+              const DecoratedBox(decoration: BoxDecoration(gradient: AppTheme.veloFoto)),
+              Positioned(
+                top: arriba + 8,
+                left: 12,
+                right: 12,
+                child: Row(
+                  children: [
+                    BotonCircular(
+                      icono: Icons.arrow_back_rounded,
+                      tooltip: 'Volver',
+                      onTap: () => Navigator.maybePop(context),
+                    ),
+                    const Spacer(),
+                    if (!vistaPrevia) ...[
+                      BotonFavorito(profesionalId: p.id, sobreFoto: true),
+                      const SizedBox(width: 4),
+                      BotonCircular(icono: Icons.flag_outlined, tooltip: 'Reportar perfil', onTap: onReportarPerfil),
+                    ],
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
-        if ((p.descripcion ?? '').isNotEmpty) ...[
-          const _Titulo('Sobre su trabajo'),
-          Tarjeta(child: Text(p.descripcion!, style: texto.bodyLarge?.copyWith(height: 1.4))),
-        ],
-        if ((p.horario ?? '').isNotEmpty || p.parroquias.isNotEmpty) ...[
-          const _Titulo('Datos'),
-          Tarjeta(
-            child: Column(
-              children: [
-                if ((p.horario ?? '').isNotEmpty)
-                  _Dato(icono: Icons.schedule_rounded, titulo: 'Horario', texto: p.horario!),
-                if ((p.horario ?? '').isNotEmpty && p.parroquias.isNotEmpty) const Divider(height: 24),
-                if (p.parroquias.isNotEmpty)
-                  _Dato(
-                    icono: Icons.place_outlined,
-                    titulo: 'Zonas que cubre',
-                    texto: p.parroquias.map((z) => z.nombre).join(', '),
+        ),
+        // Tarjeta superpuesta con los datos principales
+        Transform.translate(
+          offset: const Offset(0, -44),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Tarjeta(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: [
+                      if (p.verificado) const Pildora.verificado(),
+                      if (p.disponibleAhora) const Pildora.disponible(),
+                    ],
                   ),
+                  if (p.verificado || p.disponibleAhora) const SizedBox(height: 10),
+                  Text(p.nombrePublico, style: texto.headlineSmall),
+                  if (p.oficios.isNotEmpty)
+                    Text(
+                      p.oficios.map((o) => o.nombre).join(' · '),
+                      style: texto.bodyMedium?.copyWith(color: AppTheme.naranjaTexto, fontWeight: FontWeight.w600),
+                    ),
+                  const SizedBox(height: 14),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _Dato(
+                          icono: Icons.star_rounded,
+                          colorIcono: AppTheme.amarillo,
+                          valor: p.totalResenas == 0 ? 'Nuevo' : p.promedioEstrellas.toStringAsFixed(1),
+                          etiqueta: p.totalResenas == 0
+                              ? 'sin reseñas'
+                              : '${p.totalResenas} ${p.totalResenas == 1 ? 'reseña' : 'reseñas'}',
+                        ),
+                      ),
+                      _Separador(),
+                      Expanded(
+                        child: _Dato(
+                          icono: Icons.workspace_premium_outlined,
+                          valor: p.aniosExperiencia == null ? '—' : '${p.aniosExperiencia}',
+                          etiqueta: p.aniosExperiencia == 1 ? 'año de exp.' : 'años de exp.',
+                        ),
+                      ),
+                      _Separador(),
+                      Expanded(
+                        child: _Dato(
+                          icono: Icons.payments_outlined,
+                          valor: p.precioTexto ?? '—',
+                          etiqueta: 'desde',
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (p.parroquias.isNotEmpty) ...[
+                    const Divider(height: 28),
+                    MiniDato(icono: Icons.place_outlined, texto: p.parroquias.map((z) => z.nombre).join(', ')),
+                  ],
+                  if ((p.horario ?? '').isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    MiniDato(icono: Icons.schedule_rounded, texto: p.horario!),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ),
+        Transform.translate(
+          offset: const Offset(0, -44),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if ((p.descripcion ?? '').isNotEmpty) ...[
+                  const TituloSeccion('Sobre mí'),
+                  Text(p.descripcion!, style: texto.bodyLarge),
+                ],
+                if (p.servicios.isNotEmpty) ...[
+                  const TituloSeccion('Servicios'),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [for (final s in p.servicios) _ChipServicio(s)],
+                  ),
+                ],
+                if (cargandoDetalle)
+                  const Padding(
+                    padding: EdgeInsets.only(top: 32),
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                else ...[
+                  if (p.fotos.isNotEmpty) ...[
+                    const TituloSeccion('Trabajos realizados'),
+                    SizedBox(
+                      height: 128,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: p.fotos.length,
+                        separatorBuilder: (_, _) => const SizedBox(width: 10),
+                        itemBuilder: (context, i) => Semantics(
+                          button: true,
+                          label: 'Ver foto ${i + 1} de ${p.fotos.length}',
+                          child: GestureDetector(
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                fullscreenDialog: true,
+                                builder: (_) => _VisorFotos(fotos: p.fotos, inicial: i),
+                              ),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(AppTheme.radioChico),
+                              child: SizedBox(width: 128, child: _Imagen(url: p.fotos[i].url)),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                  TituloSeccion(
+                    'Reseñas${p.totalResenas > 0 ? ' (${p.totalResenas})' : ''}',
+                    accion: vistaPrevia
+                        ? null
+                        : TextButton.icon(
+                            onPressed: onCalificar,
+                            icon: const Icon(Icons.star_outline_rounded),
+                            label: Text(miResena ? 'Editar la mía' : 'Calificar'),
+                          ),
+                  ),
+                  if (p.resenas.isEmpty)
+                    Text('Todavía nadie ha dejado una reseña.', style: texto.bodyMedium?.copyWith(color: AppTheme.gris))
+                  else
+                    for (final r in p.resenas)
+                      _TarjetaResena(
+                        resena: r,
+                        esMia: r.clienteId != null && r.clienteId == usuarioActual?.id,
+                        onReportar: vistaPrevia ? null : () => onReportarResena(r),
+                      ),
+                ],
               ],
             ),
           ),
-        ],
-
-        // Fotos
-        if (cargandoDetalle)
-          const Padding(
-            padding: EdgeInsets.only(top: 32),
-            child: Center(child: CircularProgressIndicator()),
-          )
-        else ...[
-          if (p.fotos.isNotEmpty) ...[
-            const _Titulo('Trabajos realizados'),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: p.fotos.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                mainAxisSpacing: 8,
-                crossAxisSpacing: 8,
-              ),
-              itemBuilder: (context, i) => GestureDetector(
-                onTap: () => _verFotos(context, p.fotos, i),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: _Imagen(url: p.fotos[i].url),
-                ),
-              ),
-            ),
-          ],
-
-          // Reseñas
-          _Titulo('Reseñas${p.totalResenas > 0 ? ' (${p.totalResenas})' : ''}'),
-          if (!vistaPrevia) ...[
-            OutlinedButton.icon(
-              onPressed: onCalificar,
-              icon: const Icon(Icons.star_outline_rounded),
-              label: Text(
-                p.resenas.any((r) => r.clienteId != null && r.clienteId == usuarioActual?.id)
-                    ? 'Editar tu reseña'
-                    : '¿Te atendió? Califícalo',
-              ),
-            ),
-            const SizedBox(height: 12),
-          ],
-          if (p.resenas.isEmpty)
-            Text('Todavía nadie ha dejado una reseña.', style: TextStyle(color: gris))
-          else
-            for (final r in p.resenas)
-              _TarjetaResena(
-                resena: r,
-                esMia: r.clienteId != null && r.clienteId == usuarioActual?.id,
-                onReportar: vistaPrevia ? null : () => onReportarResena(r),
-              ),
-        ],
+        ),
       ],
     );
   }
-
-  void _verFotos(BuildContext context, List<FotoTrabajo> fotos, int inicial) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        fullscreenDialog: true,
-        builder: (_) => _VisorFotos(fotos: fotos, inicial: inicial),
-      ),
-    );
-  }
-}
-
-class _Titulo extends StatelessWidget {
-  const _Titulo(this.texto);
-  final String texto;
-
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(top: 24, bottom: 10),
-    child: Text(texto, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 18)),
-  );
 }
 
 class _Dato extends StatelessWidget {
-  const _Dato({required this.icono, required this.titulo, required this.texto});
+  const _Dato({required this.icono, required this.valor, required this.etiqueta, this.colorIcono = AppTheme.naranjaBoton});
+
   final IconData icono;
-  final String titulo;
-  final String texto;
+  final String valor;
+  final String etiqueta;
+  final Color colorIcono;
 
   @override
-  Widget build(BuildContext context) => Row(
-    crossAxisAlignment: CrossAxisAlignment.start,
+  Widget build(BuildContext context) => Column(
     children: [
-      Container(
-        padding: const EdgeInsets.all(9),
-        decoration: BoxDecoration(color: AppTheme.lila, borderRadius: BorderRadius.circular(12)),
-        child: Icon(icono, size: 20, color: const Color(0xFF6A3FD8)),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icono, size: 18, color: colorIcono),
+          const SizedBox(width: 4),
+          Flexible(
+            child: Text(valor, maxLines: 1, overflow: TextOverflow.ellipsis, style: Theme.of(context).textTheme.titleMedium),
+          ),
+        ],
       ),
-      const SizedBox(width: 12),
-      Expanded(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              titulo,
-              style: const TextStyle(fontSize: 12.5, color: AppTheme.gris, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 2),
-            Text(texto, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
-          ],
-        ),
-      ),
+      Text(etiqueta, style: const TextStyle(fontSize: 12, color: AppTheme.gris)),
     ],
   );
 }
 
-class _Aviso extends StatelessWidget {
-  const _Aviso({required this.icono, required this.texto});
-  final IconData icono;
+class _Separador extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => Container(width: 1, height: 34, color: AppTheme.borde);
+}
+
+class _ChipServicio extends StatelessWidget {
+  const _ChipServicio(this.texto);
   final String texto;
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(12),
-    decoration: BoxDecoration(color: const Color(0xFFE8F0FE), borderRadius: BorderRadius.circular(12)),
+    padding: const EdgeInsets.fromLTRB(6, 6, 14, 6),
+    decoration: BoxDecoration(
+      color: AppTheme.tarjeta,
+      borderRadius: BorderRadius.circular(AppTheme.radioBoton),
+      border: Border.all(color: AppTheme.borde),
+    ),
     child: Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icono, color: const Color(0xFF1A73E8)),
-        const SizedBox(width: 10),
-        Expanded(child: Text(texto)),
+        Container(
+          width: 28,
+          height: 28,
+          decoration: const BoxDecoration(color: AppTheme.crema, shape: BoxShape.circle),
+          child: const Icon(Icons.check_rounded, size: 16, color: AppTheme.naranjaBoton),
+        ),
+        const SizedBox(width: 8),
+        Text(texto, style: Theme.of(context).textTheme.labelLarge?.copyWith(color: AppTheme.azul)),
       ],
     ),
   );
@@ -326,7 +389,7 @@ class _TarjetaResena extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Tarjeta(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 12, 4, 14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -335,34 +398,29 @@ class _TarjetaResena extends StatelessWidget {
                 FilaEstrellas(estrellas: resena.estrellas),
                 if (esMia) ...[
                   const SizedBox(width: 8),
-                  Text(
+                  const Text(
                     'Tu reseña',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppTheme.naranjaTexto),
                   ),
                 ],
                 const Spacer(),
-                Text(
-                  '${f.day} ${_meses[f.month - 1]} ${f.year}',
-                  style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.outline),
-                ),
+                Text('${f.day} ${_meses[f.month - 1]} ${f.year}', style: const TextStyle(fontSize: 12, color: AppTheme.gris)),
                 if (onReportar != null && !esMia)
-                  SizedBox(
-                    width: 32,
-                    height: 24,
-                    child: PopupMenuButton<String>(
-                      padding: EdgeInsets.zero,
-                      iconSize: 18,
-                      onSelected: (_) => onReportar!(),
-                      itemBuilder: (_) => const [PopupMenuItem(value: 'r', child: Text('Reportar reseña'))],
-                    ),
-                  ),
+                  PopupMenuButton<String>(
+                    tooltip: 'Opciones de la reseña',
+                    iconSize: 20,
+                    onSelected: (_) => onReportar!(),
+                    itemBuilder: (_) => const [PopupMenuItem(value: 'r', child: Text('Reportar reseña'))],
+                  )
+                else
+                  const SizedBox(width: 12),
               ],
             ),
-            if ((resena.comentario ?? '').isNotEmpty) ...[const SizedBox(height: 8), Text(resena.comentario!)],
+            if ((resena.comentario ?? '').isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(right: 12, top: 4),
+                child: Text(resena.comentario!, style: Theme.of(context).textTheme.bodyMedium),
+              ),
           ],
         ),
       ),
@@ -379,10 +437,10 @@ class _Imagen extends StatelessWidget {
   Widget build(BuildContext context) => CachedNetworkImage(
     imageUrl: url,
     fit: fit,
-    placeholder: (_, _) => Container(color: Theme.of(context).colorScheme.surfaceContainerHighest),
+    placeholder: (_, _) => Container(color: AppTheme.campo),
     errorWidget: (_, _, _) => Container(
-      color: Theme.of(context).colorScheme.surfaceContainerHighest,
-      child: const Icon(Icons.broken_image_outlined),
+      color: AppTheme.campo,
+      child: const Icon(Icons.broken_image_outlined, color: AppTheme.grisSuave),
     ),
   );
 }
@@ -401,17 +459,16 @@ class _VisorFotos extends StatelessWidget {
         controller: PageController(initialPage: inicial),
         itemCount: fotos.length,
         itemBuilder: (_, i) => InteractiveViewer(
-          child: Center(
-            child: _Imagen(url: fotos[i].url, fit: BoxFit.contain),
-          ),
+          child: Center(child: _Imagen(url: fotos[i].url, fit: BoxFit.contain)),
         ),
       ),
     );
   }
 }
 
-class _BotonesContacto extends StatelessWidget {
-  const _BotonesContacto({required this.onWhatsapp, required this.onLlamar});
+/// Botón fijo abajo: "Contactar por WhatsApp" + llamar.
+class _BarraContacto extends StatelessWidget {
+  const _BarraContacto({required this.onWhatsapp, required this.onLlamar});
   final VoidCallback onWhatsapp;
   final VoidCallback onLlamar;
 
@@ -419,9 +476,9 @@ class _BotonesContacto extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: AppTheme.tarjeta,
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-        boxShadow: [BoxShadow(color: Color(0x146A3FD8), blurRadius: 20, offset: Offset(0, -4))],
+        boxShadow: AppTheme.sombra,
       ),
       child: SafeArea(
         top: false,
@@ -430,119 +487,28 @@ class _BotonesContacto extends StatelessWidget {
           child: Row(
             children: [
               Expanded(
-                flex: 3,
-                child: FilledButton.icon(
-                  onPressed: onWhatsapp,
-                  style: FilledButton.styleFrom(backgroundColor: AppTheme.verdeWhatsapp, foregroundColor: Colors.white),
-                  icon: const Icon(Icons.chat_rounded),
-                  label: const Text('WhatsApp'),
-                ),
+                child: PrimaryButton(texto: 'Contactar por WhatsApp', icono: Icons.chat_rounded, onPressed: onWhatsapp),
               ),
               const SizedBox(width: 10),
-              Expanded(
-                flex: 2,
-                child: OutlinedButton.icon(
-                  onPressed: onLlamar,
-                  icon: const Icon(Icons.call_rounded),
-                  label: const Text('Llamar'),
+              Tooltip(
+                message: 'Llamar',
+                child: Material(
+                  color: AppTheme.crema,
+                  shape: const CircleBorder(),
+                  child: InkWell(
+                    customBorder: const CircleBorder(),
+                    onTap: onLlamar,
+                    child: const SizedBox(
+                      width: 56,
+                      height: 56,
+                      child: Icon(Icons.call_rounded, color: AppTheme.naranjaBoton),
+                    ),
+                  ),
                 ),
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-/// Encabezado azul: foto, nombre, calificación y oficios.
-class _Cabecera extends StatelessWidget {
-  const _Cabecera({required this.profesional});
-  final Profesional profesional;
-
-  @override
-  Widget build(BuildContext context) {
-    final p = profesional;
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 24, 20, 22),
-      decoration: BoxDecoration(
-        gradient: AppTheme.degradado,
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: const [BoxShadow(color: Color(0x336A3FD8), blurRadius: 24, offset: Offset(0, 10))],
-      ),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(4),
-            decoration: const BoxDecoration(color: AppTheme.acento, shape: BoxShape.circle),
-            child: AvatarProfesional(profesional: p, radio: 48),
-          ),
-          const SizedBox(height: 14),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Flexible(
-                child: Text(
-                  p.nombrePublico,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white, fontSize: 23, fontWeight: FontWeight.w800),
-                ),
-              ),
-              if (p.verificado) ...[
-                const SizedBox(width: 6),
-                const Tooltip(
-                  message: 'Verificado: cédula y referencias revisadas',
-                  child: Icon(Icons.verified_rounded, color: Color(0xFFFFC94A), size: 24),
-                ),
-              ],
-            ],
-          ),
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(color: const Color(0x1FFFFFFF), borderRadius: BorderRadius.circular(20)),
-            child: p.totalResenas == 0
-                ? const Text(
-                    'Sin reseñas aún',
-                    style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w600),
-                  )
-                : Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.star_rounded, color: AppTheme.acento, size: 20),
-                      const SizedBox(width: 4),
-                      Text(
-                        p.promedioEstrellas.toStringAsFixed(1),
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
-                      ),
-                      Text(
-                        '  ·  ${p.totalResenas} ${p.totalResenas == 1 ? 'reseña' : 'reseñas'}',
-                        style: const TextStyle(color: Colors.white70),
-                      ),
-                    ],
-                  ),
-          ),
-          if (p.disponibleAhora) ...[const SizedBox(height: 10), const InsigniaDisponible(sobreOscuro: true)],
-          if (p.oficios.isNotEmpty) ...[
-            const SizedBox(height: 14),
-            Wrap(
-              alignment: WrapAlignment.center,
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final o in p.oficios)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                    decoration: BoxDecoration(color: AppTheme.lila, borderRadius: BorderRadius.circular(20)),
-                    child: Text(
-                      o.nombre,
-                      style: const TextStyle(color: Color(0xFF4A2A9C), fontWeight: FontWeight.w700, fontSize: 13),
-                    ),
-                  ),
-              ],
-            ),
-          ],
-        ],
       ),
     );
   }

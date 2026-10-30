@@ -279,3 +279,19 @@ test('borrar cuenta: se borra solo la propia, con todos sus datos', async () => 
             (select count(*) from auth.users where id = $3)::int otro`, [efimera, perfil, beto]);
   assert.deepEqual(rows[0], { u: 0, p: 0, r: 0, otro: 1 });
 });
+
+// ---------------------------------------------------------------- datos del perfil
+
+test('perfil: precio, experiencia y servicios con límites', async () => {
+  const dueña = await crearCuenta(db);
+  const perfil = await crearPerfil(db, dueña);
+  const editar = (campos, valores) =>
+    como(db, dueña, `update profesionales set ${campos} where id = $1`, [perfil, ...valores]);
+  await editar(`precio_desde = $2, anios_experiencia = $3, servicios = $4`, [15, 8, ['Instalaciones', 'Emergencias 24h']]);
+  await assert.rejects(editar(`precio_desde = $2`, [0]));
+  await assert.rejects(editar(`precio_desde = $2`, [999999]));
+  await assert.rejects(editar(`anios_experiencia = $2`, [200]));
+  await assert.rejects(editar(`servicios = $2`, [Array.from({ length: 9 }, (_, i) => `Servicio ${i}`)]));
+  await assert.rejects(editar(`servicios = $2`, [['x'.repeat(200)]]));
+  await assert.rejects(editar(`servicios = $2`, [['a']]));
+});

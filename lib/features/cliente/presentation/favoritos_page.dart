@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../data/cliente_repositorio.dart';
-import '../data/contacto.dart';
 import '../data/favoritos.dart';
 import '../data/modelos.dart';
 import 'perfil_page.dart';
-import 'widgets/tarjeta_profesional.dart';
+import 'widgets/worker_card.dart';
 import 'widgets/vacio.dart';
 
 /// Profesionales guardados con el corazón.
@@ -102,7 +101,7 @@ class _FavoritosPageState extends State<FavoritosPage> {
                     icono: Icons.favorite_border_rounded,
                     accion: FilledButton(
                       onPressed: widget.onExplorar,
-                      style: AppTheme.botonAcento,
+                      
                       child: const Text('Explorar oficios'),
                     ),
                   );
@@ -112,15 +111,12 @@ class _FavoritosPageState extends State<FavoritosPage> {
                     for (final p in lista)
                       Padding(
                         padding: const EdgeInsets.only(bottom: 12),
-                        child: TarjetaProfesional(
+                        child: WorkerCardHorizontal(
                           profesional: p,
                           onTap: () => Navigator.push(
                             context,
-                            MaterialPageRoute(
-                              builder: (_) => PerfilPage(repo: widget.repo, resumen: p),
-                            ),
+                            MaterialPageRoute(builder: (_) => PerfilPage(repo: widget.repo, resumen: p)),
                           ),
-                          onWhatsapp: () => contactar(widget.repo, p, CanalContacto.whatsapp),
                         ),
                       ),
                   ],

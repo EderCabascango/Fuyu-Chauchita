@@ -13,6 +13,9 @@ class DatosPerfil {
     required this.whatsapp,
     this.descripcion,
     this.horario,
+    this.precioDesde,
+    this.aniosExperiencia,
+    this.servicios = const [],
     required this.oficioIds,
     required this.parroquiaIds,
   });
@@ -21,6 +24,9 @@ class DatosPerfil {
   final String whatsapp;
   final String? descripcion;
   final String? horario;
+  final double? precioDesde;
+  final int? aniosExperiencia;
+  final List<String> servicios;
   final Set<int> oficioIds;
   final Set<int> parroquiaIds;
 
@@ -29,6 +35,9 @@ class DatosPerfil {
     'whatsapp': whatsapp,
     'descripcion': _vacioANull(descripcion),
     'horario': _vacioANull(horario),
+    'precio_desde': precioDesde,
+    'anios_experiencia': aniosExperiencia,
+    'servicios': servicios.isEmpty ? null : servicios,
   };
 
   static String? _vacioANull(String? s) => (s == null || s.trim().isEmpty) ? null : s.trim();
@@ -51,6 +60,7 @@ class ProfesionalRepositorio {
         .select(
           'id, nombre_publico, foto_url, descripcion, whatsapp, horario, '
           'disponible_ahora, verificado, promedio_estrellas, total_resenas, estado, '
+          'precio_desde, anios_experiencia, servicios, '
           'oficios(id, nombre, icono), parroquias(id, nombre), '
           'fotos_trabajo(id, url, orden), resenas(id, estrellas, comentario, creado_en)',
         )

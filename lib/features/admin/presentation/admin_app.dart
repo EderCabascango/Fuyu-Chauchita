@@ -116,7 +116,7 @@ class _LoginAdminState extends State<_LoginAdmin> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text('Oficios Cayambe', style: Theme.of(context).textTheme.labelLarge),
+                    Text('Chauchita', style: Theme.of(context).textTheme.labelLarge),
                     Text(
                       'Panel de administración',
                       style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),

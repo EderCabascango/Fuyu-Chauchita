@@ -1,4 +1,4 @@
-# Oficios Cayambe
+# Chauchita
 
 App Android (Flutter + Supabase) que reúne a los profesionales de oficios de Cayambe
 y permite contactarlos directo por WhatsApp. La especificación completa está en
@@ -49,7 +49,8 @@ Cada feature separa `data/` (consultas a Supabase) de `presentation/` (pantallas
    3. `supabase/migrations/20261029000000_ingreso_google.sql`
    4. `supabase/migrations/20261030000000_seguridad_y_oficios.sql`
    5. `supabase/migrations/20261031000000_oficios_delivery_flores.sql`
-   6. `supabase/seed.sql`
+   6. `supabase/migrations/20261101000000_precio_experiencia_servicios.sql`
+   7. `supabase/seed.sql`
 3. (Opcional, para probar) `supabase/demo/datos_demo.sql`: 12 profesionales ficticios.
    Bórralos antes del lanzamiento con `supabase/demo/borrar_demo.sql`.
 4. Configura el ingreso con Google ([docs/GOOGLE.md](docs/GOOGLE.md)) y por correo ([docs/CORREO.md](docs/CORREO.md)) para que funcione "Soy profesional" y las reseñas.

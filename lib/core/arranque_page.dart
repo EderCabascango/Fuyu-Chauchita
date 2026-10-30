@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'constantes.dart';
-import 'iconos_oficio.dart';
 import 'theme/app_theme.dart';
 
-/// Pantalla de carga al abrir la app: logo y nombre con una animación corta,
-/// mientras se prepara la conexión. Luego pasa a `destino`.
+/// Pantalla de carga al abrir la app: logo de Chauchita con una animación
+/// corta mientras se prepara la conexión. Luego pasa a `destino`.
 class ArranquePage extends StatefulWidget {
   const ArranquePage({
     super.key,
@@ -28,11 +26,8 @@ class ArranquePage extends StatefulWidget {
 
 class _ArranquePageState extends State<ArranquePage> with SingleTickerProviderStateMixin {
   late final _anim = AnimationController(vsync: this, duration: const Duration(milliseconds: 900))..forward();
-  late final _escala = CurvedAnimation(parent: _anim, curve: Curves.easeOutBack);
-  late final _texto = CurvedAnimation(
-    parent: _anim,
-    curve: const Interval(0.35, 1, curve: Curves.easeOut),
-  );
+  late final _pin = CurvedAnimation(parent: _anim, curve: const Interval(0, 0.7, curve: Curves.easeOutBack));
+  late final _texto = CurvedAnimation(parent: _anim, curve: const Interval(0.35, 1, curve: Curves.easeOut));
 
   @override
   void initState() {
@@ -45,13 +40,13 @@ class _ArranquePageState extends State<ArranquePage> with SingleTickerProviderSt
     try {
       final resultados = await Future.wait([widget.preparar(), Future<void>.delayed(widget.duracionMinima)]);
       error = resultados.first as String?;
-    } catch (e) {
+    } catch (_) {
       error = 'No se pudo iniciar la app. Revisa tu conexión e inténtalo de nuevo.';
     }
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
-        transitionDuration: const Duration(milliseconds: 450),
+        transitionDuration: const Duration(milliseconds: 400),
         pageBuilder: (_, _, _) => widget.destino(error),
         transitionsBuilder: (_, animacion, _, hijo) => FadeTransition(opacity: animacion, child: hijo),
       ),
@@ -67,87 +62,46 @@ class _ArranquePageState extends State<ArranquePage> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(gradient: AppTheme.degradado),
-        child: SafeArea(
-          child: Column(
-            children: [
-              const Spacer(flex: 3),
-              ScaleTransition(
-                scale: _escala,
-                child: Ilustracion(
-                  'carga',
-                  alto: 170,
-                  respaldo: Container(
-                    width: 118,
-                    height: 118,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(36),
-                      boxShadow: const [BoxShadow(color: Color(0x40000000), blurRadius: 30, offset: Offset(0, 14))],
+      backgroundColor: AppTheme.fondo,
+      body: SafeArea(
+        child: Column(
+          children: [
+            const Spacer(flex: 3),
+            ScaleTransition(
+              scale: _pin,
+              child: Image.asset('assets/marca/pin.png', height: 150, semanticLabel: 'Chauchita'),
+            ),
+            const SizedBox(height: 22),
+            FadeTransition(
+              opacity: _texto,
+              child: SlideTransition(
+                position: Tween(begin: const Offset(0, 0.4), end: Offset.zero).animate(_texto),
+                child: Column(
+                  children: [
+                    Image.asset('assets/marca/chauchita.png', height: 54, excludeFromSemantics: true),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Profesionales de confianza en Cayambe',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: AppTheme.gris),
                     ),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        const Icon(Icons.home_repair_service_rounded, size: 60, color: AppTheme.morado),
-                        Positioned(
-                          right: 18,
-                          top: 18,
-                          child: Container(
-                            width: 18,
-                            height: 18,
-                            decoration: const BoxDecoration(color: AppTheme.acento, shape: BoxShape.circle),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 28),
-              FadeTransition(
-                opacity: _texto,
-                child: SlideTransition(
-                  position: Tween(begin: const Offset(0, 0.4), end: Offset.zero).animate(_texto),
-                  child: Column(
-                    children: [
-                      Text.rich(
-                        TextSpan(
-                          children: [
-                            TextSpan(text: '${nombreApp.split(' ').first} '),
-                            TextSpan(
-                              text: nombreApp.split(' ').skip(1).join(' '),
-                              style: const TextStyle(color: AppTheme.acento),
-                            ),
-                          ],
-                        ),
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 34,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: -0.5,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Profesionales de confianza cerca de ti',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white70, fontSize: 15, fontWeight: FontWeight.w600),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const Spacer(flex: 3),
-              const SizedBox(
-                width: 26,
-                height: 26,
-                child: CircularProgressIndicator(strokeWidth: 3, color: AppTheme.acento),
-              ),
-              const SizedBox(height: 40),
-            ],
-          ),
+            ),
+            const Spacer(flex: 3),
+            const SizedBox(
+              width: 26,
+              height: 26,
+              child: CircularProgressIndicator(strokeWidth: 3, color: AppTheme.naranja),
+            ),
+            const SizedBox(height: 28),
+            FadeTransition(
+              opacity: _texto,
+              child: Image.asset('assets/marca/fuyu.png', height: 26, semanticLabel: 'Un producto de Fuyu'),
+            ),
+            const SizedBox(height: 24),
+          ],
         ),
       ),
     );

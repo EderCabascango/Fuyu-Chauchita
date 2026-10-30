@@ -30,8 +30,8 @@ class Vacio extends StatelessWidget {
             respaldo: Container(
               width: 104,
               height: 104,
-              decoration: const BoxDecoration(color: AppTheme.lila, shape: BoxShape.circle),
-              child: Icon(icono, size: 48, color: AppTheme.morado),
+              decoration: const BoxDecoration(color: AppTheme.crema, shape: BoxShape.circle),
+              child: Icon(icono, size: 48, color: AppTheme.naranjaBoton),
             ),
           ),
           const SizedBox(height: 16),

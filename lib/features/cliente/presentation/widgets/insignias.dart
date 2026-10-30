@@ -10,11 +10,11 @@ class InsigniaDisponible extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorTexto = sobreOscuro ? Colors.white : const Color(0xFF0B7A3B);
+    final colorTexto = sobreOscuro ? Colors.white : AppTheme.verdeDisponible;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: sobreOscuro ? const Color(0x3325D366) : AppTheme.verdeWhatsapp.withValues(alpha: 0.15),
+        color: AppTheme.fondoDisponible,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -46,7 +46,7 @@ class IconoVerificado extends StatelessWidget {
   Widget build(BuildContext context) {
     return Tooltip(
       message: 'Verificado: cédula y referencias revisadas',
-      child: Icon(Icons.verified_rounded, size: tamano, color: const Color(0xFF1A73E8)),
+      child: Icon(Icons.verified_rounded, size: tamano, color: AppTheme.naranjaBoton),
     );
   }
 }
