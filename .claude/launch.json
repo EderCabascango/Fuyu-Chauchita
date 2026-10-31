@@ -24,6 +24,18 @@
         "build/web_app"
       ],
       "port": 8086
+    },
+    {
+      "name": "sitio-legal",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8087",
+        "--directory",
+        "sitio"
+      ],
+      "port": 8087
     }
   ]
 }

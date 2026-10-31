@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../privacidad_page.dart';
 import '../theme/app_theme.dart';
 import 'sesion.dart';
 
@@ -218,6 +219,18 @@ class _LoginPageState extends State<LoginPage> {
               'Solo usamos tu nombre y correo para identificar tu cuenta. No se muestran a otras personas.',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 12.5, color: AppTheme.gris),
+            ),
+            const SizedBox(height: 6),
+            // Aceptación de términos antes de crear cuenta (Play lo exige en apps con reseñas).
+            Center(
+              child: TextButton(
+                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PrivacidadPage())),
+                child: const Text(
+                  'Al continuar aceptas los Términos de uso y la Política de privacidad',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 12.5, decoration: TextDecoration.underline),
+                ),
+              ),
             ),
           ],
         ),

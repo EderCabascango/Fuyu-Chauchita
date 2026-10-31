@@ -1,9 +1,14 @@
-/// Nombre visible de la app (pendiente de definir, ver especificación).
+/// Nombre visible de la app.
 const nombreApp = 'Chauchita';
 
-/// URL pública de la política de privacidad (docs/politica-privacidad.html).
-/// Llénala cuando la publiques; Play Store la exige. Vacía = no se muestra el enlace.
-const urlPrivacidad = '';
+/// Dirección pública de las páginas de la carpeta `sitio/` (sin "/" al final),
+/// por ejemplo 'https://usuario.github.io/chauchita'. Play Store exige la política
+/// de privacidad y la página para borrar la cuenta. Vacía = no se muestran los enlaces.
+const urlSitio = '';
+
+const urlPrivacidad = urlSitio == '' ? '' : '$urlSitio/privacidad.html';
+const urlTerminos = urlSitio == '' ? '' : '$urlSitio/terminos.html';
+const urlEliminarCuenta = urlSitio == '' ? '' : '$urlSitio/eliminar-cuenta.html';
 
 /// Correo de soporte que se muestra en la app. Vacío = no se muestra.
 const correoSoporte = '';
