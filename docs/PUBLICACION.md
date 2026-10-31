@@ -31,14 +31,17 @@ de privacidad caída o que no coincide con el formulario de Seguridad de los dat
 
 ## 1. Publicar las páginas legales (gratis, con GitHub Pages)
 
-1. Los 4 archivos de `sitio/` ya tienen el responsable (Wladimir Cabascango) y el correo de contacto.
-2. En GitHub crea un repositorio **público** llamado `chauchita` (solo tendrá estas páginas, nada del código).
-3. Sube el **contenido** de la carpeta `sitio/` (los `.html`, `estilos.css` y `pin.png`) a la raíz del repositorio.
-4. En el repositorio: **Settings → Pages → Branch: main / (root) → Save**. En 1–2 minutos queda en
-   `https://edercabascango.github.io/chauchita/`.
+1. Los 4 archivos de `sitio/` ya tienen el responsable (Wladimir Cabascango) y el correo de contacto
+   (iafuyutech@gmail.com).
+2. Se publican solas con GitHub Actions (`.github/workflows/sitio.yml`) cada vez que cambia `sitio/`.
+   Solo hay que activarlo una vez: en el repositorio **Settings → Pages → Build and deployment →
+   Source: GitHub Actions**.
+3. Quedan en `https://edercabascango.github.io/Fuyu-Chauchita/`. Si una publicación falla, ve a la
+   pestaña **Actions → Publicar páginas legales → Run workflow**.
+4. El repositorio es público: no subas nunca `.env`, llaves ni contraseñas (están en `.gitignore`).
 5. Abre las 3 páginas en el celular para comprobar que cargan.
-6. La app ya apunta a `https://edercabascango.github.io/chauchita` (`urlSitio` en
-   `lib/core/constantes.dart`). Si usas otro nombre de repositorio, cámbialo ahí y vuelve a compilar.
+6. La app ya apunta a `https://edercabascango.github.io/Fuyu-Chauchita` (`urlSitio` en
+   `lib/core/constantes.dart`). Si cambias el nombre del repositorio, cámbialo ahí y vuelve a compilar.
 
 > Este texto es una base sólida pero no reemplaza una revisión legal. Si la app crece o empiezas a
 > cobrar, conviene que un abogado lo revise.
@@ -95,13 +98,13 @@ para entender errores. Para cada actualización sube el número en `pubspec.yaml
 
 | Sección | Qué responder |
 |---|---|
-| Política de privacidad | `https://edercabascango.github.io/chauchita/privacidad.html` |
+| Política de privacidad | `https://edercabascango.github.io/Fuyu-Chauchita/privacidad.html` |
 | Acceso a la app | "Toda la funcionalidad está disponible sin restricciones" **no**; elige "Algunas funciones están restringidas" y explica: *Buscar y contactar no requiere cuenta. Para publicar un perfil o reseñar se ingresa con cualquier cuenta de Google desde Perfil → Ingresar.* |
 | Anuncios | No contiene anuncios |
 | Clasificación de contenido | Categoría "Todas las demás". Violencia, sexo, drogas, apuestas: No. **Los usuarios pueden interactuar o compartir contenido: Sí** (reseñas). Comparte ubicación: No. Compras digitales: No |
 | Público objetivo | 18 años o más. No atrae a niños |
 | Seguridad de los datos | Tabla de abajo |
-| Eliminación de cuentas | URL: `https://edercabascango.github.io/chauchita/eliminar-cuenta.html` |
+| Eliminación de cuentas | URL: `https://edercabascango.github.io/Fuyu-Chauchita/eliminar-cuenta.html` |
 | Apps gubernamentales, financieras, de salud, noticias | No |
 | ID de publicidad | No usa ID de publicidad |
 
@@ -152,7 +155,7 @@ Todo lo que es "Opcional" se marca como **procesado de forma efímera: No** y **
 > Un producto de Fuyu.
 
 **Categoría:** Casa y hogar. **Correo de contacto:** el mismo de `correoSoporte`.
-**Sitio web:** `https://edercabascango.github.io/chauchita/`.
+**Sitio web:** `https://edercabascango.github.io/Fuyu-Chauchita/`.
 
 **Gráficos:** ícono 512×512 (`assets/icono/icono.png`), gráfico de funciones 1024×500 y de 2 a 8
 capturas del teléfono (inicio, lista de un oficio, perfil con fotos, favoritos, "Mi perfil").
